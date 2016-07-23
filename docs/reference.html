@@ -1,0 +1,1366 @@
+<!doctype html>
+<html>
+<head>
+  <title>Berry Language Reference</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <meta charset="utf-8" />
+  <meta name="description" content="Berry Language Reference" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
+  
+  <style>
+  body 
+  {
+    max-width: 960px;
+    min-width: 600px;
+    margin: 0 auto;
+    font: 16px "Open Sans";
+    counter-reset: h2;
+    background: #FDFDFE;
+  }
+  h2 {counter-reset: h3;}
+  h3 {counter-reset: h4;}
+  h4 {counter-reset: h5;}
+  h5 {counter-reset: h6;}
+  h2:before { word-spacing: 0.5em; counter-increment: h2; content: counter(h2) " "}
+  h3:before { word-spacing: 0.5em; counter-increment: h3; content: counter(h2) "." counter(h3) " " }
+  h4:before { word-spacing: 0.5em; counter-increment: h4; content: counter(h2) "." counter(h3) "." counter(h4) " " }
+  h5:before { word-spacing: 0.5em; counter-increment: h5; content: counter(h2) "." counter(h3) "." counter(h4) "." counter(h5) " " }
+  h6:before { word-spacing: 0.5em; counter-increment: h6; content: counter(h2) "." counter(h3) "." counter(h4) "." counter(h5) "." counter(h6) " " }
+  
+  h2.nocount:before, h3.nocount:before, h4.nocount:before, h5.nocount:before, h6.nocount:before { content: ""; counter-increment: none } 
+  
+  h1, h2 {
+    font: 600 2em "Open Sans";
+    padding: 0 0 0.4em 0;
+    border-bottom: 2px solid #ccc;
+    margin: 0.5em 0 0.75em 0;
+  }
+  h3 {
+    font: 600 1.5em "Open Sans";
+    padding: 0 0 0.3em 0;
+    margin: 1em 0.5em 0.75em 0.5em;
+    border-bottom: 1px solid #ccc;
+  }
+  h4 {
+    font: 600 1.25em "Open Sans";
+    padding: 1em 0 0.2em 0;
+    margin: 1em 1em 0.5em 1em;
+    border-bottom: 1px solid #dfdfdf;
+  }
+  h5 {
+    font: 600 1em "Open Sans";
+    padding: 1em 0 0.1em 0;
+    margin: 1em 2em 0.75em 2em;
+    border-bottom: 1px solid #eee;
+  }
+  h6 {
+    font: 500 1em "Open Sans";
+    padding: 1em 0 0.1em 0;
+    margin: 1em 2.5em 0.75em 2.5em;
+    border-bottom: 1px solid #eee;
+  }
+  
+  ol {
+    counter-reset: section;
+    list-style-type: none;
+  }
+  ol li:before {
+    counter-increment: section;
+    content: counters(section,".") " ";
+    word-spacing: 0.5em;
+  }
+  ol li {
+    font: 500 15px "Open Sans";
+    line-height: 20px;
+  }
+  ul {
+    margin: 0.25em 0;
+    list-style: none;
+  }
+  ul li:before {
+    font-weight: 900;
+    content: "\0000b7";
+    padding-right: 0.4em;
+  }
+  a { 
+    color: #007fbf;
+    text-decoration: none;
+  }
+  a:visited { 
+    color: #005f7f;
+  }
+  pre {
+    margin: 0.75em 0.5em;
+    border-left: 2px solid #ddd;
+    padding: 0.5em 0.75em;
+    background: #F9F9FA;
+    white-space: pre-wrap;       /* css-3 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    word-wrap: break-word;
+  }
+  blockquote {
+    margin: 0.75em 0;
+    padding: 0.5em 1.5em;
+    background: #EAEAF9;
+    border-top: 1px solid #D0D0FF;
+    border-bottom: 1px solid #D0D0FF;
+  }
+  .berryword {
+    color: #0069d2;
+  }
+  .berrytype {
+    color: #1e9393;
+  }
+  .berrycomment, .berrycomment .berrytype, .berrycomment .berryword {
+    color: #007900;
+  }
+  table {
+    margin: 1.5em 0.5em;
+    border-spacing: 0;
+    border-top: 1px solid #DDD;
+    border-left: 1px solid #DDD;
+  }
+  table tr th {
+    text-align: center;
+    font-weight: bold;
+    border-right: 1px solid #DDD;
+    border-bottom: 1px solid #666;
+    padding: 0.25em 0.75em;
+  }
+  table tr td {
+    border-right: 1px solid #DDD;
+    border-bottom: 1px solid #DDD;
+    padding: 0.25em 0.75em;
+  }
+  footer {
+    border-top: 1px solid #BBB;
+    padding: 0.5em 0 0 0.5em;
+    margin: 1.5em 0.125em 1em 0.125em;
+    font-size: 80%;
+    font-style: italic;
+  }
+  .footnotes {
+    padding:0 1.5em;
+  }
+  .footnotes p {
+    padding-left:0.5em;
+    display:block;
+    font-size:80%;
+  }
+  .footnotes p sup span {
+    margin-left: -0.5em;
+    font-size:100%;
+  }
+  </style>
+</head>
+<body>
+<h1>Berry Language Reference</h1>
+
+<ol id="tableofcontents"></ol>
+
+<h2 id="introduction">Introduction</h2>
+This document serves as both a reference and a formal standard for the Berry programming language. It is not intended as an introduction to the language, nor is the material presented in a linear fashion. For an introductory tutorial on using Berry, see the <a href="#">standard tutorials</a>. A reference compiler and its source code is available <a href="#">on github</a>. The Berry programming language is an open-source project managed and maintained by <a href="http://blackspherestudios.com">Black Sphere Studios</a>, released under the <a href="#">Revised BSD License</a>.
+<br/>
+<br/>This reference guide is released under the <a href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International</a>, with help from:
+<ul><li>Erik McClure</li>
+<li>Jesin</li></ul>
+
+<h3 id="notation">Notation</h3>
+Berry uses a dialect of EBNF to describe its grammar, similar to the one used by ANTLR3, which can be recursively defined as follows:
+
+<pre>
+grammar : rule + ;
+rule    : nonterminal ':' productionrule ';' ;
+productionrule : production ( '|' production ) * ;
+production : term * ;
+term : element repeats ;
+element : LITERAL | IDENTIFIER | '(' productionrule ')' ;
+repeats : ( '*' | '+' ) NUMBER ? | NUMBER ? | '?' ;</pre>
+
+The grammar rules associated with a given language element will be listed in the beginning of each segment. The parsing section lists the exact details of the grammar and contains the entire language grammar. The grammar assumes that a lexer has passed through and tokenized the elements using a collection of regular expressions. An <code>ID</code> is any collection of characters that do not start with a number and aren't punctuation. An <code>OPERATOR</code> is any collection of punctuation marks. A <code>NUMBER</code> is any collection of numeric digits beginning with a number, followed by certain accepted exponential forms and suffixes. The precise expressions used for these are given in the <a href="#formal_grammar">formal grammar</a>.
+
+<h3 id="unicode">Unicode</h3>
+Berry's grammar is defined such that identifiers and tokens are simply any valid ascii character that is not an operator character or a whitespace character. This deliberately includes all high-value ascii characters. For this reason, all Berry code is assumed to be in UTF-8 format, and consequently, all string literals in any code file must also be encoded in UTF-8. Ideally, code editors should respect this and correctly render the corresponding Unicode character for non-ascii codepoints. The compiler is <i>not allowed</i> to assume that the language tokens are ascii-only, in order to support future international localization.
+<br/>
+<br/>However, in some cases, one may be in a situation where the text editor only understands ascii, or the unicode character you desire is not easily accessible. Berry provides the \uXXXX escape character in strings for this purpose (see the <a href="#lexer_strings">string specification</a>).
+<h2 id="berrymain">Berry</h2>
+Berry is a <a href="https://en.wikipedia.org/wiki/Formal_verification">verifiable</a>, compiled, multi-paradigm language, supporting imperative-procedural, object-oriented, and functional programming. It is memory-safe, type-safe, and implements memory management entirely through lifetime analysis. Berry has no garbage collector, and includes optional manual memory management. All operations in Berry have fully defined behavior, or at most have platform-specific edge cases. Optimization is performed using advanced static analysis built into the compiler itself. Pure functions are first-class objects recognized by the compiler, and common functional programming idioms can be efficiently optimized.
+<br/>
+<br/>Berry is designed for high performance, system critical code, and tracks unsafe operations through the type system itself. Unsafe contexts isolate direct manipulation of assembly code from the rest of the code, ensuring the optimizer will never break code. Formal verification using the type system allows Berry to act as a <a href="https://en.wikipedia.org/wiki/Proof_assistant">Proof Assistant</a> by constructing a <i>Proof of Correctness</i> from the source code implementation of an algorithm and ensure it satisifies the preconditions and postconditions of a function. Attempting to violate the assumptions for a function results in a compiler error.
+<br/>
+<br/>Berry employs a pragmatic design philosophy: rather than limiting what programmers can do, the language provides facilities for analyzing the correctness of functions and isolating unsafe operations. Instead of shielding the programmer from the CPU, Berry provides the programmer with powerful tools to safely manipulate it. Berry provides precise mathematical descriptions for everything, down to the individual assembly instructions. Berry's compiler has maximum visibility, such that as little of the language as possible is implemented via "compiler magic". Instead, most of the language is implemented in the standard library and is easily debuggable.
+<h3 id="high_level_constructs">High-level Constructs</h3>
+<h4 id="berry_file">File</h4>
+<pre>
+berry : chunk+ ;
+pubpriv : 'public' | 'private' ;
+decl : attribute* pubpriv? ( class | funcvarbind | typedef | enum ) ;
+chunk : decl | namespace | using | assume | ruleimport | impl | basicmacro | attributemacro ;
+</pre>
+
+Each individual source file in Berry is a distinct collection of top level structures or statements. While everything in Berry is globally accessible by default, files form their own scopes. Variables and classes declared at the base file level with the <code>private</code> keyword will be <b>file-scoped</b>, and only available to code inside that source file. Certain statements, such as <a href="#using"><code>using</code></a> and <a href="#import"><code>import</code></a>, are always file-scoped. Files are never directly referenced in Berry - all code is accessible from any source file that is part of the same executable or DLL.
+
+<h4 id="namespace">Namespace</h4>
+<pre>namespace : "namespace" TYPEID [ '.' TYPEID ]* '{' chunk+ '}'</pre>
+
+A namespace is what Berry uses to organize code. Namespaces can contain any statement, including other namespaces. Namespaces may be distributed between multiple code files, and all the code inside a given namespace will be accessible to any other code inside the same namespace, even if it is in a different file. Declaring something private in a namespace will make it accessible only to other code inside the same namespace, or any child namespaces. You can implicitly declare a namespace as part of another namespace by simply appending that namespace with a period:
+
+<pre class="highlight">
+namespace Parent.Parent2.Child {
+  namespace Child2 {
+    // The full name of this namespace is Parent.Parent2.Child.Child2
+  }
+}
+</pre>
+
+All namespaces are global and can be accessed with a using statement in any file.
+
+<h4 id="function">Function</h4>
+<pre>
+funcmods : 'static' | 'pure' | 'virtual' | 'abstract' ;
+funcbegin : funcmods* funcvartype (ID | 'op' OPERATOR ) ;
+funcend : '(' ( paramdecl ( ',' paramdecl )* )? ')' ( block | ';' ) ;
+function : funcbegin funcend;
+funcvarbind : funcbegin ( '=' expr ';' | ';' | funcend ) ;
+</pre>
+
+Functions in berry are mostly the same as functions in any other language. They can exist outside classes or inside classes, can be templatized, can be virtual, and they can be overloaded. Berry also has a concept of <i>pure</i> functions, which do not have any side effects. Any function that does not modify it's parameters or depend on any mutable global variables will be promoted to a pure function by the compiler, but a programmer can also mark a function as pure, which will cause a compiler error if the function has any side-effects. All operators in Berry are actually functions as well, and they can be declared using the special <code>op</code> prefix.
+<br/>
+<br/>Functions inside classes can be made static, or they can be member functions of the class. An <code>abstract</code> function has no implementation, and implicitly means that the class it belongs to is also abstract and cannot be instantiated unless a subclass implements that function. A virtual function has an implementation, but can be overridden by inherited classes. A static function cannot be virtual or abstract.
+<br/>
+<br/>While you can have multiple functions of the same name in a class with different type signatures, any function that has the same name as a virtual function in a base class <i>must</i> conform to one of it's type signatures, unless this default behavior is overridden via <code>[Supersede]</code>.
+<h5 id="function_overloads">Function Overloads</h5>
+Like in many other languages, you can write functions with the same name, but different type signatures. This is known as function overloading. The compiler will choose the most appropriate function overload to call based on the function's types, preferring more specific types over more general ones. Because function overloading is a subset of <a href="#templates">template overloading</a>, it is actually just syntactic sugar for declaring a template overload. This means that if you declare two overloaded functions, you will always be able to differentiate between them manually by explicitly specifying the template, if you need to. When choosing a type, the function will attempt to match the exact type first, followed by any of the types that it implements, followed by any implicit type conversions supported by the type, followed by the slice or array modifiers, followed by references. An arbitrary reference is the most general and has the least priority, a pinned reference has the same priority as a nullable reference, and a non-nullable reference is considered a subset of a nullable reference and has even higher priority. If attempts to resolve the type result in ambiguities or paradoxes, a compiler error will be thrown.
+
+<pre class="highlight">
+// As function overloads
+float sqrt(float x) { return x; }
+double sqrt(double x) { return x; }
+
+// The above is syntactically equivalent to the following
+template[float]
+float sqrt(float x) { return x; }
+template[double]
+double sqrt(double x) { return x; }
+
+// Thus, regardless of which syntax is used, you can always manually specify the type
+var x = sqrt(2);
+var y = sqrt[double](2);
+</pre>
+<h5 id="partial_application">Operators</h5>
+Excluding certain reserved operators, Berry allows user defined operators, prefixed by <code>op</code>. Operators can be declared as member variables of a class, in which case they automatically gain the class as a first argument, or as static operators. Berry will use whatever operator overloads are available in the namespace context of an expression. While most operators are triggered by simply writing code like <code>x + y</code>, you can also manually call them using their <code>op</code> prefix. Because operator overloading is the same as function overloading, which is itself simply template overloading, you can always manually specify the operator you want using explicit template arguments.
+
+<pre class="highlight">
+// These are all syntactically identical
+var x = 2 + 4;
+var y = op+(2,4);
+var z = op+[int](2,4);
+</pre>
+<h5 id="partial_application">Partial Application</h5>
+Berry natively supports the partial application of a function. Partial applications are functions that have had <i>some</i> of their parameters specified, but not all. In Berry, this is done by using an <code>_</code> (underscore) on an argument to tell the compiler that the argument is being skipped. By default, the result of this call will be a fully qualified <a href="lambda_functions">lambda function</a> (which is required if you have placed a variable in the partial application that goes out of scope before the partial application does) that can be manipulated like any other lambda function. However, certain static and pure functions can be reduced to raw function pointers if they can be resolved to purely stateless functions at the compiler's discretion. For small functions, this is irrelevent, as they will be inline'd out of existence by the optimizer. Partial function application is often used in functional applications like <code>map()</code>, espiecally when used in conjuntion with operators.
+
+<pre class="highlight">
+var x = {1,2,3,4,5};
+var f = op+[int](_,1); // f is now equivalent to fn[int](x) { return x+1 }
+
+var y = map(x, f);
+// y is now 2,3,4,5,6
+</pre>
+<h4 id="class">Class</h4>
+<pre>
+classdecl : decl | 'public:' | 'private:' ;
+class : ( 'class' | 'trait' ) ID ( ':' dotrawtype ( ',' dotrawtype)* )? '{' classdecl* '}' ;
+</pre>
+
+Classes in Berry behave mostly like classes in other languages. They can have functions, other classes, member variables, static functions, static member variables, enums, or typedefs defined inside of them. Everything in a class is <i>publicly accessible</i> by default, but this can be changed using C++ style keywords <code>public:</code> or <code>private:</code>. Private elements can only be accessed by a subclass that inherits the class, or the class itself.
+<br/>
+<br/>Classes support multiple inheritance, and can inherit from other classes or implement <a href="#trait">traits</a>.
+<h4 id="enum">Enum</h4>
+<pre>enum : 'enum' ID ( ':' rawtype ) ? '{' ID '=' expr ( ',' ID '=' expr )* '}' ;</pre>
+
+An enumeration is a way to assign constant values to more sensible identifiers and group them together. Values inside an enumeration must be accessed from the enumeration type itself - they do not "spill out" into the surrounding namespace. Enumerations can inherit from any primitive type. This means you can create an enum consisting of floats or strings, not just integers. An enum can have it's values automatically assigned only if it inherits from an integral value. If no subtype is provided, enums default to the pointer-sized <code>int</code>. In an integral enumeration, any element without an associated constant expression will simply start counting up from the last element, or be set to 0 if there is no previous element. Negative integral values are allowed only if the enumeration inherits from a signed integral type.
+
+<pre class="highlight">
+enum Basic : u16
+{
+  Rabbit = 1,
+  Squirrel = 2,
+  Tree,
+}
+
+private enum Names : string
+{
+  JohnTucker = "John Tucker",
+  Feldo = "Feldo"
+}
+</pre>
+<h4 id="trait">Trait</h4>
+Traits are used as constraints in template metaprogramming. A trait contains a list of abstract function signatures and variable declarations that a class must implement if that class tries to implement the trait. Template type arguments can be restricted by requiring that the type implement one or more traits, which then allow the function to safely manipulate the type without actually knowing what class is involved. For example, a template function that quickly finds the square root of any integral type would require that it's template argument implements the Integral type. Then, the function can freely manipulate it's template argument as if it were an integer. This allows <b>type-safe template metaprogramming</b> and is a cornerstone of Berry's strong type system.
+<br/>
+<br/>To declare a <code>trait</code>, simply use the exact same syntax one would use for a <code>class</code>, but use the <code>trait</code> keyword instead. Traits can inherit any number of other traits, and the resulting trait will be the <b>union</b> of all the requirements of each trait that is inherited. A compiler error will be thrown if a trait attempts to inherit from two incompatible traits (for example, if one trait requires a length variable of type i8 and another requires a length variable of type u64).
+<pre class="highlight">
+public trait Printable
+{
+  string ToString() const;
+}
+</pre>
+<h5 id="impl_statement">Impl</h5>
+<pre>impl : 'impl' dotrawtype (':' dotrawtype)? ('{' classdecl* '}' | ';') ;</pre>
+The <code>impl</code> keyword is used to implement a trait on a class that did not originally implement the trait. The syntax is the same as a class, but if a required function signature is already provided by the class (even though it did not explicitely implement the trait), then it doesn't need to be explicitly provided in the new implementation. Because of this, an implementation can be blank if a class already fully satisifies the requirements of a trait. This is also true for empty traits that exist for metadata purposes only. Empty implementations can simply end their declaration with a semicolon instead of requiring braces. This allows programmers to retrofit classes from a different library to work inside their own library, without having to modify the other library. This ensures that, even if two incompatible sets of traits are used between two libraries, the types can be modified to work for both libraries without needing new classes or types to be declared.
+<pre class="highlight">
+class Rational
+{
+  string ToString() const { return ""; }
+}
+
+impl Rational:Printable; // no body needed, because Rational already satisfies the requirements of the Printable trait, it simply did not explicitly implement it.
+impl Rational:Number
+{
+    float ToFloat() const { return 0.0f; }
+}
+</pre>
+In addition, impl can be used to add arbitrary functions that don't necessarily belong to any trait whatsoever to any type after it has been declared, which allows a programmer to extend an existing type without needing to inherit it.
+<pre class="highlight">
+impl Rational
+{
+    int ToInt() const { return 0; }
+}
+</pre>
+<h5 id="assert_assume">Assert/Assume</h5>
+The <code>assume</code> keyword functions in a similar fashion to C++'s <code>assert</code>: at runtime, in debug mode, if the conditional expression is false, the program crashes. In release mode, the check is never compiled. However, the compiler will also assume that the conditional expression given to <code>assume()</code> is <code>true</code> for the rest of the function for the purposes of optimization, <i>even in release mode</i>. This is normally used on user-input if the program does not want to handle invalid input, or it can be used to surpress errors about unresolvable range checks. An example would be an array access that depends on a code path too complex for the compiler to analyze, but the programmer knows that the index will always be valid, so they use <code>assume(index < #array)</code>, which will crash the program in debug mode if their assuption is wrong, but allow the code to be compiled without a range check, because the compiler will now assume <code>index</code> is always a valid range.
+<br/>
+<br/>The <code>assert</code> keyword functions the same way as C++'s <code>static_assert</code> in that it must be evaluated at compile time based on the current assumptions and preconditions (which include any assumptions made using <code>assume</code>). This is useful for ensuring certain conditions that can't be expressed in the Preconditions of a function because they need to be enforced in the middle of a function.
+
+<h4 id="macros">Macros</h4>
+<pre>
+MACRO ::= '`' [^`]+ '`'
+macro_embed : MACRO expr? (MACRO expr?)* ;
+macro_body : '{' (statement | macro_embed ';')* '}' | macro_embed ';' ;
+basicmacro : 'macro' type? ID ( '(' ( lambdadecl ( ',' lambdadecl )* )? ')' )? macro_body ; // You can have MACROs as values in the macro block itself, or just have one macro made entirely out of a macro_embed
+</pre>
+Macros are functions that operate on Berry's Abstract Syntax Tree (AST). By default, macros take AST objects as arguments and return an AST object that is inserted into the syntax tree where the macro was invoked. Macros have the ability to utilize all of Berry's compile-time reflection objects, and these objects can be used to explicitly specify what AST object will be returned by a given macro. If the return value is not specified, it will be inferred. Because of this, macros are still <b>strongly-typed</b> functions, they simply have the ability to query and manipulate the Abstract Syntax Tree and any associated meta-objects. Macros that do not take arguments may be invoked either with ID() or simply ID. Macros can contain an entire code block like a standard function, or they can simply contain a series of macro expressions, or they can be completely empty. The ISDEFINED() macro can be used to check if a macro is defined, which allows empty macros to be used as compiler flags in a similar manner to C defines.
+<br/>
+<br/>Macro expressions are code surrounded by backticks (<code>`</code>). This transforms the code inside the backticks into a single AST object that can be passed to into a macro or returned by a macro. Macro expressions placed next to each other <i>automatically concentate</i>. That means <code>`5 * ` `2 + 3`</code> is equivelent to <code>`5 * 2 + 3`</code>. This can be used to embed other macro objects into macro expressions. By default, embedding macro objects will preserve the AST structure, so if <code>x = `2 + 3`</code>, then <code>`5 * ` x</code> is equivelent to <code>`5 * (2 + 3)`</code>. Note that the operator precedence has been preserved. If you do not want this behavior, you can use the embed operator: <code>^</code>. <code>`5 * ` ^x</code> will result in <code>`5 * 2 + 3`</code>. This is useful for cases where you do <i>not</i> want to preserve the AST object structure and want to directly embed elements into a macro expression. The AST object returned by a macro always directly replaces the <i>placeholder object</i> that was created based on the macro's return value when evaluating the Abstract Syntax Tree.
+
+<pre class="highlight">
+macro min(a, b) `(` a `<` b `) ?` a `:` b;  // Returns an AST object that is injected into the AST
+</pre>
+
+<h4 id="attributes">Attributes</h4>
+<pre>attributemacro : 'attribute' ID '(' ( vardecl ( ',' vardecl )* )? ')' macro_body? ';' ;</pre>
+Attributes are metadata that can be attached to classes, enums, traits, functions, and variable bindings. These include standard attributes such as <code>[Export]</code>, and any custom attributes that a particular implementation of the Berry compiler wants to include. This allows for langauge extensions to be implemented in a controlled manner. Attributes are considered a special form of <b>macro</b> that has no return value, but has access to a <code>this</code> object that contains the reflection information for the syntax object it is attached to. Like macros, attributes can be completely empty, in which case they will automatically save any parameters they take in the form of metadata that can be accessed by other macros or attributes.
+
+<pre class="highlight">
+attribute CustomAttribute(bool Value)
+{ 
+  if(this.type == NODE_FUNCTION)
+    this.append(`profile.start(` Value `)`);
+}
+
+[Export(Language="C++")]
+class Test
+{
+  [Profile]
+  void func();
+  
+  [CustomAttribute(Value = true)]
+  int a;
+}
+</pre>
+<h4 id="standard_attributes">Standard Attributes</h4>
+<ul>
+<li><code>[Export]</code> is used to mark a function as being exported in a DLL. If necessary, additional restrictions can be put into place to force the function to be exported in a way that a foreign language will understand, like C++.</li>
+<li><code>[Import]</code> is used to import functions from a foreign language DLL. DLLs written in Berry can be imported and used directly, as they contain all necessary metadata the compiler needs.</li>
+<li><code>[Inline]</code> is a hint to the compiler that it should inline the function whenever possible. Inline'd functions are directly transplanted into the caller, such that a "call" instruction is never actually issued - the function itself is simply embedded where it would have been called. For small functions, this often has performance benefits, espiecally if a function has many parameters that would need to be pushed to the stack. Sometimes it is not possible to inline a function due to how it is called. An exported function can sometimes be inline'd when called internally, but externally it must still exist. A virtual function cannot ever be inline'd. If the compiler cannot inline the function, it will simply output a notice.</li>
+<li><code>[ForceInline]</code> functions the same as <code>[Inline]</code>, except that if the function is ever called in a situation where it can't be inline'd, it generates a compiler error. This is sometimes used for helper functions that should never actually exist - they should always be embedded inside some larger function. It can also be used to aid in debugging.</li>
+<li><code>[Profile]</code> injects profiling code into the function.</li>
+<li><code>[CallConvention(string Name)]</code> allows you to force the compiler to use a specific calling convention for a function. Exported or imported functions must use the <code>_cdecl</code> calling convention, so attempting to force the convention to anything else will be a compile error. By default, internal functions tell LLVM to simply make up whatever calling convention it wants in the name of being as fast as possible. The only calling convention any compiler is <i>required</i> to support is the <code>_cdecl</code> convention. The standard Berry compiler, however, supports any calling convention that LLVM itself supports (yes, that means you can use the GHC calling convention if you really want to).</li>
+<li><code>[TailCall]</code>: Berry <i>should</i> support proper tail call optimization in the majority of cases, but there are occasional edge cases where tail call optimization is impossible to properly implement. <code>[TailCall]</code> allows you to explicitly mark a function as requiring tail call optimization. Any function marked with <code>[TailCall]</code> must have <i>all</i> recursive invocations of itself satisfy the criteria for tail call optimization. If you attempt to call a [TailCall] function from inside itself in a way that would not be tail call optimized, it will throw a compiler error.</li>
+<li><code>[Precondition]</code> specifies the assumptions the function makes about the state of it's arguments. These arguments can be simple lists of expressions, or expressed in Calculus of Constructions. The static analyzer will throw a compiler error if these preconditions are violated under any code path.</li>
+<li><code>[Postcondition]</code> specifies what the final state of the function arguments should be, including acceptable error bounds on calculations, or a Calculus of Constructions expression. The compiler can be directed to attempt to prove this postcondition from the preconditions, or if this is impossible, it can be told to simply assume the postconditions are always valid. In some cases, the compiler can derive the postconditions from the code automatically.</li>
+<li><code>[Secure]</code> is valid for both functions and classes. When used on functions, it zeros out all registers that were used in the function, and when used in a class, ensures that the class's padding bytes and any surrounding bytes are zero'd after any operation. This prevents leak attacks that use leftover data in registers or padding bytes.</li>
+</ul>
+<h4 id="top_level_statements">Top-level statements</h4>
+<h5 id="using">Using statement</h5>
+<pre>using : "using" TYPEID [ '.' TYPEID ]*</pre>
+
+A using statement takes everything in a given namespace (or just the named class) and brings it into the local file scope. If two IDs from the different namespaces collide, attempting to use them without explicit scope names will result in an ambiguity error. Using statements are always file-scoped no matter where they appear.
+<h5 id="type_definition">Type definition</h5>
+<pre>typedef : 'type' ID '=' ( type ';' | algebraic_type ) ;</pre>
+
+This simply assigns an ID to a type expression. The type expression can be anything, so long as it can be resolved at compile-time. It is also used to declare <a href="#algebriac_types">algebraic types</a>. Typedefs are scoped according to where they are used - if used at the file level, they will be scoped to that file, if used in a namespace, they will be scoped to that namespace, etc.
+<h5 id="import">Import statement</h5>
+<pre>ruleimport : "import" STRING</pre>
+
+The import statement is used exclusively to import files from other languages. Depending on the language, they may be given their own automatic namespace determined by the file name used. Import statements are always file-scoped.
+<h3 id="language_primitives">Language Primitives</h3>
+Berry has a number of built-in elements. These elements are compiler-backed and not dependent on a standard library (although the compiler is free to try to implement the elements with Berry code if it thinks it can).
+
+<h4 id="type_primitives">Type Primitives</h4>
+<pre>
+dottype : ID template_spec? ( '.' ID template_spec? )* ;
+dotrawtype : dottype | rawtype ;
+ntype : ( 'const' | 'unsafe' )* dotrawtype ( '!' | ( 'const'? ( '@' | '$' ) )* );
+functype : 'fn' ( '.' ( ID | '(' type ')' ) )? '[' ( type ( '|' type)* )? ']' '(' ( type ( ',' type)* )? ')' ;
+type : ntype | functype;
+</pre>
+
+Types in Berry are either primitives, classes, enums, traits, or algebraic types. Fundamentally, types are objects that have operators associated with them. These operators define what other types that type can interact with. Types can define constructors and destructors, although these are usually optional because the language can use default initialization. Types always have an assignment operator, which can usually be automatically generated. Berry supports move semantics, so if a type can only be moved, only a move constructor and a move assignment operator should be defined. 
+<br/>
+<br/>Types can be casted to other types, but only if that conversion is supported. Berry has both explicit and implicit conversion. By default, all conversions are explicit, unless marked with an implicit keyword, which also applies to single-argument constructors.
+<h5 id="integer_primitives">Integer Primitives</h5>
+All integral types in berry are represented in <a href="https://en.wikipedia.org/wiki/Two%27s_complement">Two's complement</a>. If the underlying architecture does not support two's complement, the compiler must either emit code to emulate two's complement behavior while also providing a performance warning, or the compiler may simply output a compile error.
+
+<table>
+  <tr><th>Token</th><th>Size</th><th>Signed</th><th>Notes</th></tr>
+  <tr><td>i8</td><td>8-bit</td><td>Signed</td><td></td></tr>
+  <tr><td>i16</td><td>16-bit</td><td>Signed</td><td></td></tr>
+  <tr><td>i32</td><td>32-bit</td><td>Signed</td><td></td></tr>
+  <tr><td>i64</td><td>64-bit</td><td>Signed</td><td></td></tr>
+  <tr><td>u8</td><td>8-bit</td><td>Unsigned</td><td></td></tr>
+  <tr><td>u16</td><td>16-bit</td><td>Unsigned</td><td></td></tr>
+  <tr><td>u32</td><td>32-bit</td><td>Unsigned</td><td></td></tr>
+  <tr><td>u64</td><td>64-bit</td><td>Unsigned</td><td></td></tr>
+  <tr><td>int</td><td>32-bit/64-bit</td><td>Signed</td><td>Always the same size as a pointer.</td></tr>
+  <tr><td>uint</td><td>32-bit/64-bit</td><td>Unsigned</td><td>Always the same size as a pointer.</td></tr>
+  <tr><td>char</td><td>8-bit</td><td>Signed</td><td>Alias for i8, used to represent utf8 character arrays.</td></tr>
+  <tr><td>byte</td><td>8-bit</td><td>Unsigned</td><td>Alias for u8, represents 1 byte.</td></tr>
+</table>
+
+<code>int</code> and <code>uint</code> are signed and unsigned integers the same size as pointers. Thus, when compiling for x86, <code>int</code> and <code>uint</code> are 32-bit integers, but when compiling for x86-64, they are 64-bit integers. Unless you need something of a specific size, it is usually suggested that you use these integers, because their size matches up with the native word size of the processor.
+<br/>
+<br/>All integral types may be implicitly converted to a larger representation regardless of signed/unsigned without any warnings. Integral types may be implicitly converted from signed to unsigned, but it produces a signed/unsigned mismatch warning unless an explicit cast is used. Integral types may be implicitly converted to a smaller integer types, but it will produce a narrowing conversion warning unless an explicit cast is used.
+<br/>
+<br/>An integer type may be implicitly converted to a floating point number without a warning if the maximum value of the integer can be exactly represented in that floating point number. An IEEE floating point number can exactly represent an integer up to 2<sup>mantissa bits + 1</sup> + 1, so a 32-bit floating point number can represent up to 16,777,217 (2<sup>24</sup> + 1), and a 64-bit floating point number can represent up to 9,007,199,254,740,993 (2<sup>53</sup> + 1). Otherwise, the integer will be implicitly converted anyway, but with a precision warning emitted by the compiler unless an explicit cast is used.
+<br/>
+<br/>Integers cannot be implicitly cast to booleans, they can only be explicitly cast. If explicitly cast to a boolean, all nonzero values are treated as <code>true</code>, and zero is treated as <code>false</code>. Integers cannot be implicitly or explicitly cast to strings.
+<h6 id="integer_promotions">Integer promotion</h6>
+A binary operation on two integers should cast both integers to signed integers if <i>either</i> integer is signed, and the result should also be signed. If the two integers are of different sizes, both integers are cast to the largest size, and the expression evaluates to the largest size. This is recursively applied such that one signed integer in a series of binary operations will cause the entire expression to result in a signed integer. The only binary operators this does not apply to are <code>&lt;&lt;</code>, <code>&gt;&gt;</code>, <code>|&gt;</code>, <code>&lt;|</code>, and the modulo operators <code>%</code> and <code>%%</code>. For those operators, the right hand argument type is ignored entirely, and the resulting type is simply the left argument's type.
+<br/>
+<br/> Only one unary operator has an effect on integer promotion: The unary negation operator <code>'-'</code> casts it's argument to a signed integer if it was previously unsigned. In all cases, casting from unsigned to signed should produce a compiler warning if the unsigned integer has a maximum possible value large enough to cause problems when converted to a signed integer.
+
+<blockquote><b>Note:</b> If the compiler can prove an integer always has a value below 0, the compiler <i>cannot</i> prove that negating the integer will result in a positive value. This is because abs(INT_MIN) == INT_MIN, because <a href="#">INT_MIN has no positive representation</a>. The compiler must be given permission to assume INT_MIN is not a possible value before it can assume the result is always positive and therefore unsigned.</blockquote>
+
+<h5 id="float_primitives">Floating-point Primitives</h5>
+Floating point numbers are all assumed to be <a href="https://en.wikipedia.org/wiki/IEEE_floating_point">IEEE-compliant</a> and to behave accordingly. In some cases, the compiler may be given permission to relax these requirements in order to speed up floating point calculations. This can include changing the FPU's precision, flushing denormals to zero, or ignoring certain errors. All of these potential optimizations will be precisely captured in the mathematical analysis of the floating point's possible values. The compiler uses <a href="https://en.wikipedia.org/wiki/Interval_arithmetic">Interval Arithmetic</a> combined with a set of state flags to prove what the entire range of possible values a given floating point is allowed to take, and what the maximum error bound of any given calculation is. This information can be utilized when writing <a href="#">PostConditions</a> to cause a compiler error if the underlying architecture or optimization choices incur too much error in a given calculation.
+<br/>
+<br/>Berry supports 3 different floating point sizes, corresponding to the <a href="https://en.wikipedia.org/wiki/Half_precision_floating-point_format">half</a>, <a href="https://en.wikipedia.org/wiki/Single_precision_floating-point_format">single</a>, and <a href="https://en.wikipedia.org/wiki/Double_precision_floating-point_format">double</a> precision standards.
+<table>
+  <tr><th>Token</th><th>Size</th><th>Notes</th></tr>
+  <tr><td>f16</td><td>16-bit</td><td>Half precision floating point</td></tr>
+  <tr><td>f32</td><td>32-bit</td><td>Single precision</td></tr>
+  <tr><td>f64</td><td>64-bit</td><td>Double precision</td></tr>
+  <tr><td>float</td><td>32-bit</td><td>Alias for f32</td></tr>
+  <tr><td>double</td><td>64-bit</td><td>Alias for f64</td></tr>
+</table>
+Floating point numbers can be implicitly converted to larger floating point types without a warning. A floating point number can be implicitly converted to a smaller floating point type, but the compiler must emit a narrowing conversion warning. They <i>cannot</i> be implicitly converted to integral types; an explicit cast is required. 
+<h5 id="string_primitives">String Primitives</h5>
+The string primitives represent UTF-8, UTF-16, or UTF-32 encoded <i>null-terminated</i> character strings and provide standard string manipulation functions. Strings in Berry are simply thin wrappers around slices, and therefore can contain null characters, as they track their own length. Despite this, <b>all string objects are null terminated</b>. This allows string objects to be safely passed to other languages. However, a string's length <i>will not include the null terminator</i>, so no slices created from the string will ever include the null terminator. In Berry, slices are the primary method of manipulating strings, and the null-terminator is ignored.
+<br/>
+<br/>
+<ul>
+<li><b>string</b>: A UTF-8 encoded string, can <i>explicitly</i> cast to string16/string32. Can implicitly cast to a char[:] slice.</li>
+<li><b>string16</b>: A UTF-16 encoded string, can <i>explicitly</i> cast to string8/string32. Can implicitly cast to a i16[:] slice.</li>
+<li><b>string32</b>: A UTF-32 encoded string, can <i>explicitly</i> cast to string8/string16. Can implicitly cast to a i32[:] slice.</li>
+</ul>
+<br/>
+The string constructors are carefully designed to insert null-terminators only when necessary. A string constructed from a slice will <i>always</i> allocate an additional null terminator. A string constructed directly from another string will <i>not</i> add an additional null terminator, and instead will simply copy or move the entire string. A string constructed from a raw unsafe char@ pointer without length information will assume that the string must be null terminated, and will also copy the null terminator into itself. A string constructed from a raw unsafe char@ pointer <i>with</i> length information, on the other hand, will add an additional null-terminator regardless of the contents of what it is copying. For this reason, if you are constructing a string out of an unsafe context and providing a length, <b>the length must not include the null terminator</b> or you will end up with two null terminators.
+<br/>
+<br/>Slices derived from strings never include the null terminator.
+<h5 id="bool_primitives">Boolean</h5>
+A boolean type, represented by <code>bool</code>, can represent either <code>true</code> or <code>false</code>, and is the result of many comparison operators. It cannot be implicitly cast to any other type, but it can be explicitly cast to an integer. Casting a boolean to an integer results in 1 for true and 0 for false. If the underlying hardware implementation does not natively represent booleans this way, the compiler is expected to produce assembly code that emulates this behavior.
+<h5 id="void_type">Void</h5>
+<code>void</code> represents the absence of a type. It is only used in return values to represent the total absence of a return value, and in <code>unsafe</code> contexts to represent a pointer to an arbitrary location in memory with an unknown type. It cannot be used anywhere else.
+<h4 id="types">Types</h5>
+Berry utilizes a strong type system built on top of <a href="#traits">traits</a>, <a href="#templates">variadic templates</a> and <a href="#algebriac_types">algebriac types</a>. By enforcing a consistent type graph, Berry can accurately infer the type of any statement or function that is not itself ambiguous. Thus, Berry retains the benefits of strong typing, but frees the programmer from having to explicitly derive complex type interactions.
+<h5 id="templates">Templates</h5>
+<pre>
+template_param : type ( ID ( OPERATOR expr )? | ( ':' type ( '+' type )* )? ( '=' type )? );
+template : 'template' '[' ( template_param ( ',' template_param )* ( ',' ID '...' )? )? ']' ;
+template_spec : '[' expr ( ',' expr )* ']' ;
+</pre>
+Berry's templating system is syntactically similar to C++, but has been streamlined and now maps to a mathematically consistent type system. There are no partial or explicit specializations of templates - instead, all templatized instances of a class or function are simply possible matches for a template, or <i>template overloads</i>, which works the same way as <a href="#function_overloads">function overloading</a>. An argument without a type is considered a type argument, and may be restricted using traits. While the basic template system is built on a standard <a href="https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system">Hindley-Milner type system</a>, traits extend the type system with the notion of <a href="https://en.wikipedia.org/wiki/Type_class">constrained types</a>.
+<br/>
+<br/>Template matching uses the same specificity rules as <a href="#function_overloading">function overloading</a>, with the additional notion of traits. The compiler must attempt to match the <i>most specific</i> trait possible, while also matching the most specific type. The trait matching should happen <i>before</i> any other specificity rules come into play. Templates can also have a variable number of arguments - these are called variadic templates. A variadic template overload always has the <i>lowest priority possible</i>, such that even a nonspecific generic type will be preferred over a variadic template argument. 
+
+<pre class="highlight">
+template[T:Square, F:Real = double] // By default, F is a double
+F area(T s) {}
+
+template[T:Rectangle, float]
+float area(T s) {}
+
+template[I:Integral]
+I FastSqrt(I x) {}
+
+template[float]
+float FastSqrt(float x) {}
+
+template[double]
+double FastSqrt(double x) {}</pre>
+
+<h6 id="dependent_types">Dependent Types</h5>
+Berry also supports putting concrete values into templates, just like C++, but instead of only supporting explicit specialization of those values, Berry extends the syntax to allow for any arbitrary comparison to be made on a value between any other value. Combined with a few special cases, this acts as an implementation of <a href="https://en.wikipedia.org/wiki/Dependent_type">dependent types</a> and forms the bedrock of Berry's formal verification systems. The same constraints that can be placed on dependent types are used in <a href="#preconditions">Preconditions</a> and <a href="#postconditions">Postconditions</a> to prove the correctness of a function.
+
+<pre class="highlight">
+template[int i = 0] // By default, i equals 0.
+int EnumDependent() { return i; }
+
+template[int i == 1] // this template is used when i is equal to 1
+uint EnumDependent() { return i; }
+
+template[int i &gt; 1] // this template is used when i is greater than 1
+uint EnumDependent() { return i; }
+
+template[int A, int B &gt; A] // this template is used when B is greater than A
+uint ComplexDependent() { return B - A; }</pre>
+
+<h6 id="variadic_templates">Variadic Templates</h5>
+In addition to supporting matching with arbitrary types or constant values at compile time, Berry supports powerful variadic templates whose arguments can be easily parsed using common language objects like a for loop, or indexed. Template arguments can have arbitrary slices from their type pack taken, or from their argument list. All of them can be indexed and iterated via a for loop and passed to other variadic template functions.
+
+<pre class="highlight">
+template[T:Printable, Args...]
+void func(T a, Args args)
+{
+  for(int I = 0; I < #Args; ++i)
+    Print(args[i]);
+  otherfunc[Args[0:#Args-3]](args[0:#Args-3]);
+  func[Args](args);
+}</pre>
+
+<h5 id="algebriac_types">Algebraic Types</h5>
+<pre>
+algebraic_inner : '{' (algebraic_type | type)+ '}' ;
+algebraic_type : ID algebraic_inner ;</pre>
+
+Berry supports algebraic types, which allow a variable to take on different types at runtime. Algebriac types themselves have no constructors or destructors. Instead, you call the constructor of the type you want and assign it to the algebriac type. You can assign an algebriac type to any type it contains, or any other algebriac type that forms a subset of its types. If a function is returning an algebriac type, you may simply return an object of the type you want, and the algebriac type will be instantiated using that object and assigned the appropriate type (although the actual copy constructor may be optimized out). Algebriac types may define types inside of themselves, which can be accessed with the standard Parent.Child.Child pattern.
+<br/>
+<br/>You may only cast an algebriac type to one of it's subtypes if the compiler can prove there are no other possible types it could represent. If there is no other possible type, you may also access the type using the <code>AlgebriacType.SubType.member</code> syntax. Usually, you should use a switch statement to access the appropriate type. When using a switch statement on an algebriac type, the case statements contain types instead of values, and optionally can include an alias ID for accessing that type. The alias ID is scoped to the appropriate case statement, so they don't need to be unique (see <a href="#switch_statement">Switch Statement</a>). If all possible types of an algebriac type <i>inherit from</i> the same subtype, the algebriac type can be cast to that subtype.
+
+<pre class="highlight">
+type Dog = { int | Mutt { int b; int c; } }
+type Animal = {
+  Cat { String name; f64 weight; } | Dog | Rodent { Mouse { int d; } | Rat { float e; } }
+}
+
+// You can then choose which type you want in a switch statement on that variable
+Animal foo = Dog();
+Animal baa = Animal.Cat{ name = "test", weight = 0 }; // standard initializer list
+
+switch(baa)
+{
+  case Animal.Cat c:
+    return c.name;
+  case Dog c:
+    switch(c)
+    {
+      case int i:
+        return i;
+      case Mutt:
+        return c.Mutt.b;
+    }
+}
+
+{Animal.Cat | Animal.Rodent} dothings(int a) { return (a<0)?Animal.Cat():Animal.Rodent(); }
+
+fn[Animal.Cat | Animal.Rodent](int a) funcpointer = dothings;
+</pre>
+
+Shorthand syntax for describing unnamed algebriac types is available for function declarations, function pointers and lambda functions. Unlike in the full declaration, the shorthand syntax does not allow you to declare new types.
+<br/>
+<br/>Internally, algebraic types are implemented as tagged unions. An integer tag is used to identify which type to use and a union stores them all in the same memory space, so the size of an algebraic type is always the size of it's largest possible member. Note, however, that an optimizer is allowed to demote an algebraic type reference to one of it's child type references if all possible code paths use only that type, which may reduce it's size. To help with optimization, the compiler will usually hash every single type in a given program to a unique integer ID. However, when dealing with algebriac types from another library, it won't be able to anticipate those IDs, and a crossover check will be necessary. There are also certain situations where an algebriac type is less than the 4-byte or 8-byte alignment boundary, in which case it may attempt to use a u8 or a u16, which may not be able to store all possible IDs and therefore would require another crossover check. 
+<h5 id="function_pointers">Function Pointers</h5>
+<pre>functype : 'fn' ( '.' ( ID | '(' type ')' ) )? '[' ( type ( '|' type)* )? ']' '(' ( type ( ',' type)* )? ')' ;</pre>
+
+Function pointers in berry are a fundamental type and are the atomic units used to refer to individual functions. Function pointers may be set to <code>null</code>, just like nullable references. By default, a normal function pointer can only refer to static functions that are not member functions of a class. Member function pointers use the <code>fn.ClsName[](int x)</code> format to create a pointer to a function that belongs to a specific class. While normal function pointers can be invoked using standard function invocation syntax, member functions pointers use a special invocation operator on the class: <code>obj.$FuncPtr(8,2)</code>. This is used to implement the Delegate class in the standard library.
+
+<h5 id="implicit_conversion">Implicit Conversion</h5>
+When performing implicit conversions to resolve operations or function overloads, the initial type is checked first, followed by a const version of the type and a non-nullable reference version, if applicable. If the initial type is a direct match, it is always used even if there are other potential implicit conversion candidates. If the initial type does not match, the first-order implicit conversions of the type are scanned. If one of these implicit conversions is a direct match, this is always used. If multiple implicit conversions match multiple function overloads then this is ambiguous and the compiler throws an error (for example, if you attempt to put an <code>i64</code> into a function with an <code>f32</code> and <code>f64</code> overload, the integer could be implicitly converted to both types). If none of these implicit conversions directly match, the implicit conversions of the available implicit conversions are matched - these are known as second-order implicit conversions. At this point, it is possible that two implicit conversions have second-order implicit conversions to the <i>same type</i> (for example, an object that implicitely converts to both <code>i32</code> and <code>i64</code> but not <code>f32</code> would be ambiguous if you attempted to put it into a function accepting <code>f32</code>, as both <code>i32</code> and <code>i64</code> can be coerced to <code>f32</code>). If this occurs when trying to match the type, it is ambiguous, as there is no way to know which of the two types should be coerced to the underlying type.
+<h5 id="type_modifiers">Type Modifiers</h5>
+There are several type modifiers that can be applied to types. Some type modifiers are only legal in certain situations, like <code>static</code>. These type modifiers change how the type behaves, and may introduce or remove compiler checks on those types.
+<br/>
+<br/><b><code>const</code></b> makes a type into a constant. If used on a type when it is declared, this means it can only be initialized once (which can be after it is declared, so long as the constructor is only called once) and never modified. If used on a function parameter, it means that function cannot modify that parameter. Any type can be implicitly cast into a const version of itself, but it can never be cast back, unless you use <code>unsafe</code>.
+<br/>
+<br/><b><code>unsafe</code></b> is used to perform unsafe type operations. Unsafe removes nearly all compiler type checks, allowing you to cast any type to any other type. It can also be used to get rid of <code>const</code>, or cast a type to a byte slice that can then be manipulated and cast back into another type. Unsafe is often used for very low level operations that require manipulating arbitrary chunks of memory. Unsafe is the only way to declare a <code>void@</code> type, since it is inherently unsafe and throws away type information.
+<br/>
+<br/><b><code>static</code></b> is only valid on variable declarations inside functions and inside class declarations. A static variable in a class has only one instance for the entire program and is always accessible. A static variable in a function also only has one instance for the entire program, no matter where the function is invoked. <code>static</code> has no effect on a variable declared outside of a function or a class.
+
+<h4 id="values">Values</h4>
+<pre>
+invocation : '(' ( expr ( ',' expr )* )? ')' ;
+value : NUMBER | STRING | CHARACTER | 'null' | 'true' | 'false' | ID valueafter? ;
+valueafter : ('[' expr ( ( ':' expr)+ | ( ',' expr )+ )? ']' | invocation | '{' ( ID '=' )? expr ( ',' ( ID '=' )? expr)* '}')+ | '.' value;
+</pre>
+
+Internally, <i>values</i> are the raw representations of types in memory. Values are the core entity that operations are called on, and all references must eventually resolve to a <i>value</i> that exists somewhere in memory. However, unlike in many other languages, <b>variables are not values by default!</b> By default, variables are <a href="#references">arbitrary references</a>. Forcing a variable to be a value, however, doesn't ensure it will be allocated on the stack. See <a href="#references">Pinned Types</a> for information on how to force a variable to stay on the stack. 
+<br/>
+<br/>Values can exist either on the stack or the heap, and are always managed through a reference of some kind. Because values are never directly interacted with, some of Berry's references use value-semantics instead of reference-semantics. When assigning a variable to another variable with value-semantics, the value is <i>copied</i> or <i>moved</i>.
+<h4 id="references">References</h4>
+<pre>
+dottype : ID template_spec? ( '.' ID template_spec? )* ;
+dotrawtype : dottype | rawtype ;
+ntype : ( 'const' | 'unsafe' )* dotrawtype ( '!' | ( '@' | '$' )* );
+functype : 'fn' '[' ( type ( '|' type)* )? ']' '(' ( type ( ',' type)* )? ')' ;
+type : ntype | functype;
+</pre>
+
+Berry has 4 types of references: arbitrary, pinned, nullable, and non-nullable. Arbitrary and pinned references use value-semantics, while nullable and non-nullable references use reference-semantics. Regardless of what reference is used, they are all accessed using the dot '<code>.</code>' operator.
+
+<table>
+  <tr><th>Type</th><th>Syntax</th><th>Semantics</th><th>Location</th><th>Nullable</th></tr>
+  <tr><td>Arbitrary</td><td>Type</td><td>Value</td><td>Stack or Heap</td><td>No</td></tr>
+  <tr><td>Pinned</td><td>Type!</td><td>Value</td><td>Stack</td><td>No</td></tr>
+  <tr><td>Non-nullable</td><td>Type$</td><td>Reference</td><td>N/A</td><td>No</td></tr>
+  <tr><td>Nullable</td><td>Type@</td><td>Reference</td><td>N/A</td><td>Yes</td></tr>
+</table>
+
+Pinned references are variables that have been "pinned" to the stack, and must always reside on the stack. These behave like normal variables do in C++ using value-semantics. They are copied or moved by value, and when passed in to functions, they will be passed by value. They are always bound to their current scope, and when their current scope block ends, they are destructed and removed from the stack.
+<br/>
+<br/>Arbitrary references <i>appear</i> to behave the same way as pinned references, but are allowed to exist on the heap instead of the stack, and may be passed by reference into functions instead of by value. This allows Berry to automatically lift a variable into the heap without changing it's access semantics if it needs to survive beyond its current scope by allocating it on the heap and passing a reference into a function, which can then take ownership of the memory and deallocate it later. Constant arbitrary references will be optimized to either pass by value or by reference depending on what is fastest, but mutable arbitrary references follow strict rules when passed into functions:
+<ul>
+<li>If a mutable arbitrary reference points to a <a href="#type_primitives">primitive type</a>, it will be passed <b>by value</b></li>
+<li>If a mutable arbitrary reference points to a complex type (any type that isn't primitive), it will be passed <b>by reference</b></li>
+</ul>
+This mimics the behavior of variables in C# and Java, and prevents surprises when dealing with arbitrary references in functions. However, unlike in C#, arbitrary references are not nullable, just like Pinned references.
+<br/>
+<br/>Nullable references are similar to C++ pointers, except that they can optionally own the memory they are pointing to. A nullable reference that has taken ownership of it's pointer behaves like an <code>std::unique_ptr</code>, in that it will automatically destroy the heap allocated object it is pointing to when it goes out of scope, or it is destroyed. Move semantics are used to shift pointers between nullable references. As the name suggests, nullable references are the only type of reference in Berry that is allowed to be <code>null</code>. Attempting to access a null reference is not undefined, but rather <a href="#platform_defined">platform-defined</a> behavior: the compiler will be forced to tell the CPU to literally access a pointer at memory location 0 and simply deal with whatever chaos may occur. In practice, however, this should never happen, because the compiler's <a href="#">static analysis</a> will tell you all possible code paths that could result in accessing a null reference. In debug mode, this will generate a warning, and the compiler may choose to replace the null dereference with a runtime crash. In release mode, this will be a compile error. While this behavior can be overriden, it is not recommended, as accessing the 0th page of memory can be a security issue on <a href="https://support.apple.com/en-us/HT203112">certain operating systems</a>.
+<br/>
+<br/>Because nullable references are essentially pointers, they can point to other nullable references. However, references only have two valid operators: The address-of <code>@</code> operator, and the dereference <code>$</code> operator. These operators are not overloadable by any type, and this allows Berry to <i>implicitly convert references to their dereferenced values</i>. Thus, even though assigning a reference to a value is illegal, assigning a value to a reference <b>sets the value the reference is pointing at to the target value</b>. This implicit conversion can also be used for any other standard operator, allowing you to add together two references to integers and get an integer value back. This greatly reduces the amount of dereferencing that must be done, and allows references to be treated with value-semantics in many situations.
+<br/>
+<br/>Non-nullable references are identical to nullable references, except they can never be set to <code>null</code>. They can be stacked just like nullable references, so you can have a non-nullable reference pointing to a non-nullable reference pointing to a string. The static analyzer will generate a compiler error if any code path attempts to set a non-nullable reference to <code>null</code>
+<pre>
+string BC = "foobar";
+string AB = "blah";
+AB = BC; //AB now equals "foobar"
+AB = "bar"; //AB now equals "bar" but BC is still "foobar"
+// AB = @BC; // Compile error: cannot assign reference to value.
+// AB = $BC; // Compile error: cannot de-reference value.
+
+string@ CD = "foo";
+CD = AB; // CD now equals "blah", but does not reference AB!
+CD = "bar"; // CD now equals "bar" but AB still equals "blah"
+CD = FOO_CONST; // FOO_CONST must be implicitly converted to a string, then CD is set to "foo_const"
+string@ DE = CD; // DE is now pointing to the same string the CD is pointing to
+string@ EF = string(CD); // EF is pointing to a new string that copies CD
+EF = "boots"; // EF is now "boots" but CD has not changed.
+DE = $EF; // This "dereferences" AB into a value, so DE does a value assignment.
+assert(DE == CD); // CD is now "boots" because both CD and DE point to the same string
+CD = @AB // CD; is now pointing to AB, so it equals "bar"
+CD = "bar2"; // both AB and CD now equal "bar2"
+//CD = @EF; // Compile error: cannot assign double reference to single reference
+string@@ FG = @EF; // FG now points to EF which now points to a string.
+FG = "test"; // This still compiles! The string EF is pointing to is now set to "test"
+FG = CD; // This also compiles! FG was pointing to EF, so now EF is set to CD, which itself points to AB.
+</pre>
+
+<h4 id="slices">Slice</h4>
+Slices in Berry represent subsets of arrays, and allow for efficient manipulation of strings and lists. They are a fundamental data type, created whenever the <i>slice operator</i> is used on an array (or anything that can be converted to an array). Because they are subsets of arrays, slices support all the same operations that arrays do (except resizing), which means you can take slices of slices. The slice operator takes a start index (inclusive) and an end index (exclusive), and therefore defines a range of [begin,end). A slice with the same beginning and end index will return a 0 length slice. If the beginning index is omitted, it defaults to 0, and if the end index is omitted, it defaults to the length of the source array (or slice). If negative values are used, the elements count backwards from the end. However, if a negative start value is used, a zero or negative end value must also be used, otherwise the slice would loop around, which is illegal.
+<pre>
+int[] array = { 0, 1, 2, 3, 4, 5, 6 };
+
+int[:] slice = array[1:3]; // slice is now equal to [1, 2]
+slice = array[:3]; // slice is now equal to [0, 1, 2]
+slice = array[1:]; // slice is now equal to [1, 2, 3, 4, 5, 6]
+slice = array[1:#array]; // Does the same thing as the previous line.
+slice = array[-2:]; // slice is now equal to [5, 6]
+slice = array[-2:0]; // Does the same thing as the previous line.
+slice = array[-3:-1]; // slice is now equal to [4, 5]
+slice = array[:-3]; // slice is now equal to [1, 2, 3]
+slice = array[1:-3]; // slice is now equal to [2, 3]
+//slice = array[-1:3]; // ILLEGAL. Cannot have a negative start value but positive end value!</pre>
+
+Because slices point to arbitrary points in memory, <i>slices cannot take ownership of memory!</i> A slice is only valid so long as it's parent stays in scope. If you need to take a slice outside the scope of its parent, you must generate a new array from the slice to copy the memory over before the parent goes out of scope. Attempting to access a slice after it's parent array has gone out of scope is a compiler error.
+<br/>
+<br/>Internally, slices are represented as a pointer and a length. Pointer arithmetic is used by the compiler to efficiently manage slices. Arrays actually inherit from slices and are built on top of them, so the slice and the reference form the fundamental basis of referring to data in Berry, which allows the static analyzer to ensure that <i>all</i> memory accesses are legal. 
+
+<h4 id="arrays">Array</h4>
+Arrays inherit from Slices, but manage their own memory. Arrays come in two flavors in Berry - fixed size and dynamic. Fixed size arrays are any array whose size never changes - regardless of whether it's size changes at compile time. Arrays with a fixed size determined at runtime will <i>still</i> be put on the stack, using the same VLA technique used in C11. These arrays are declared using Type[Number]. Dynamic arrays are a standard resizable array with a length and a capacity. Dynamic arrays are declared using Type[], which is really just an alias for the standard library DynArray class.
+
+<pre class="highlight">
+var a = int[3]{0, 1, 2};
+a[2] = 3;
+var b = int[]{1, 2};
+b.Push(3);</pre>
+
+Internally, the compiler includes a check on all stack allocations that will use the heap instead of the stack if the allocation becomes too large. This limit depends on the architecture, but can be overriden in the compiler options. If the compiler can prove that no allocation will ever be above this limit, the check will be removed.
+
+<blockquote><b>Note:</b> You must be careful when initializing arrays with an initializer list in Berry. <code>int[] b = int[]{1, 2, 3}</code> will result in a <i>dynamic</i> array of size 3, not a fixed size array!</blockquote>
+
+<h4 id="var">Var</h4>
+The <code>var</code> keyword is used to indicate where the type system should <i>infer</i> the type from existing variable types or function return types. Types can almost always be inferred, but there are certain ambiguous contexts that will prevent the compiler from resolving a type. <code>var</code> can be used in variable declarations, function return types, function parameters, and lambda parameters. The absence of a type, where legal, always implies <code>var</code>. When <code>var</code> is used as a parameter type, it represents a <i>universal generic type</i>, which transforms the function into a template behind the scenes, and <b>allows any type to be used without any traits</b>. This behavior is distinct from normal template types, which are required to have an appropriate trait if they have operations or functions called on them. This restriction is lifted for <code>var</code> types, which will behave more like traditional C++ template types and simply compile so long as any available function satisfies the requirements.
+
+<pre class="highlight">
+// These are all equivelent statements
+var foo = fn(x,y) -> x + y; // x and y do not need to implement a trait that requires an op+() function.
+var bar = fn[var](x,y) -> x + y;
+var foobar = fn[var](var x,var y) -> x + y;</pre>
+<h4 id="function_lambdas">Function Lambdas</h4>
+<pre>lambda : 'fn' ( '[' vartypelambda? ']' )? '(' ( lambdadecl ( ',' lambdadecl)* )? ')' funcmods* ( ':' '@'? ID (',' '@'? ID)* )? ( block | '->' expr ) ;</pre>
+
+Berry supports function lambdas, in a similar manner to C++. By default, function lambdas will capture all outside variables by reference, unless they are marked <code>pure</code>, in which case they capture all outside variables by value instead. If a lambda is marked <code>static</code>, it is stateless and cannot reference any outside variables whatsoever. If a lambda simply doesn't reference any outside variables, it will be promoted to stateless by the compiler. Stateless lambdas are simply anonymous static functions, and therefore can be assigned to raw function pointers.
+<br/>
+<br/>A lambda can specify which variables it captures using the colon syntax, followed by a comma seperated list of the variables it wishes to capture by value. A variable with <code>@</code> in front of it will be captured by reference. If a lambda attempts to capture a variable by reference, but that variable goes out of scope before the lambda does, the lambda object will attempt to take ownership of that variable (elevating it to the heap if necessary). If the variable is either owned by another object, is pinned to the stack, or otherwise cannot be owned by the lambda, the compiler will raise a compile error.
+<br/>
+<br/>Stateful lambdas can be passed in two ways. A Berry.Delegate[T] object can hold a reference to a stateful lambda, but it will be rendered invalid if the lambda goes out of scope before it does (which is a compiler error). Berry.Functor[T] is the underlying datatype for a stateful lambda and contains all the relevent information, so it can own the entire lambda and be passed around safely. 
+
+<pre class="highlight">
+fn[int](int) timestwo = fn[int](int j) { j+j; };
+
+int a = timestwo(3);
+
+Berry.Functor[void,int] closure = fn[void](int b):@a { a += b };
+</pre>
+<h5 id="delegates">Delegate</h5>
+Delegates in Berry are implemented as a class, accessible as <code>Berry.Delegate</code>. Delegates point to a member function in a class, and also contains a reference to an instance of that class. Delegates need to stay in scope of the object they are using, because they cannot own the target object they are referencing. All members of an object implicitly resolve to delegates, which provides a syntactic shortcut for generating them. Because function lambdas are objects, delegates can refer to them as well, but cannot stay in scope longer than their parent lambda.
+
+<pre class="highlight">
+Berry.Delegate[void,int] d = clsinstance.Add;
+
+clsinstance.Add(3);
+d(3); // Exactly the same as the above.
+</pre>
+<h5 id="functors">Functor</h5>
+Functors are the underlying type that implement function lambdas. They store the entire state of a function lambda and may be safely passed to different scopes.
+<h3 id="operators">Standard Operators</h3>
+While Berry allows user-defined operators, most operators are already used by the primitive types. Most of these operators can be overloaded, if necessary, but some are reserved and cannot be overriden.
+<h4 id="int_operators">Integral Operators</h4>
+Most integer operations must perform a type union on their arguments (unless stated otherwise), which must choose an appropriate type based on the <a href="#integer_promotions">integer promotion</a> rules.
+<table>
+  <tr><th>Operator</th><th>Symbol</th><th>Arity</th><th>Returns</th><th>Effect</th></tr>
+  <tr><td>Addition</td><td>+</td><td>Binary</td><td>Type Union</td><td>Adds arguments with modular arithmetic<sup><a href="#int_operators_foot1">1</a></sup>.</td></tr>
+  <tr><td>Subtraction</td><td>-</td><td>Binary</td><td>Type Union</td><td>Subtracts arguments with modular arithmetic<sup><a href="#int_operators_foot1">1</a></sup>.</td></tr>
+  <tr><td>Negation</td><td>-</td><td>Unary (prefix)</td><td>Signed</td><td>Negates argument with modular arithmetic<sup><a href="#int_operators_foot2">2</a></sup>.</td></tr>
+  <tr><td>Division</td><td>/</td><td>Binary</td><td>Type Union</td><td>Divides arguments with truncation.</td></tr>
+  <tr><td>Multiplication</td><td>*</td><td>Binary</td><td>Double Type<sup><a href="#int_operators_foot3">3</a></sup></td><td>Multiplies arguments with truncation.</td></tr>
+  <tr><td>Exponentiation</td><td>**</td><td>Binary</td><td>Double Type<sup><a href="#int_operators_foot3">3</a></sup></td><td>Exponentiates arguments with truncation.</td></tr>
+  <tr><td>Modulo</td><td>%</td><td>Binary</td><td>Left Type</td><td>Performs mathematically correct<sup><a href="#int_operators_foot4">4</a></sup> modulo.</td></tr>
+  <tr><td>Remainder</td><td>%%</td><td>Binary</td><td>Left Type</td><td>Performs remainder<sup><a href="#int_operators_foot5">5</a></sup> operation.</td></tr>
+  <tr><td>Increment</td><td>++</td><td>Unary (prefix)</td><td>Right Type</td><td>Increments and returns new value.</td></tr>
+  <tr><td>Post-Increment</td><td>++</td><td>Unary (postfix)</td><td>Left Type</td><td>Increments and returns old value.</td></tr>
+  <tr><td>Decrement</td><td>--</td><td>Unary (prefix)</td><td>Right Type</td><td>Decrements and returns new value.</td></tr>
+  <tr><td>Post-Decrement</td><td>--</td><td>Unary (postfix)</td><td>Left Type</td><td>Decrements and returns old value.</td></tr>
+  <tr><td>Xor</td><td>^</td><td>Binary</td><td>Type Union</td><td>Performs bitwise XOR on arguments.</td></tr>
+  <tr><td>And</td><td>&amp;</td><td>Binary</td><td>Type Union</td><td>Performs bitwise AND on arguments.</td></tr>
+  <tr><td>Or</td><td>|</td><td>Binary</td><td>Type Union</td><td>Performs bitwise OR on arguments.</td></tr>
+  <tr><td>Invert (Flip)</td><td>~</td><td>Unary (prefix)</td><td>Right Type</td><td>Flips all bits in argument.</td></tr>
+  <tr><td>Bitshift Left</td><td>&lt;&lt;</td><td>Binary</td><td>Left Type</td><td>Bitwise left shift, filling with 0s on right.</td></tr>
+  <tr><td>Bitshift Right</td><td>&gt;&gt;</td><td>Binary</td><td>Left Type</td><td>Bitwise right shift, filling with 0s on left.</td></tr>
+  <tr><td>Bitshift Left</td><td>&lt;&lt;&lt;</td><td>Binary</td><td>Left Type</td><td>Arithmetic<sup><a href="#int_operators_foot6">6</a></sup> Bitwise left shift, filling with 0s on right.</td></tr>
+  <tr><td>Bitshift Right</td><td>&gt;&gt;&gt;</td><td>Binary</td><td>Left Type</td><td>Arithmetic<sup><a href="#int_operators_foot6">6</a></sup> Bitwise right shift, filling with the MSB.</td></tr>
+  <tr><td>Rotate Left</td><td>&lt;|</td><td>Binary</td><td>Left Type</td><td>Bitwise left bit rotation<sup><a href="#int_operators_foot7">7</a></sup>.</td></tr>
+  <tr><td>Rotate Right</td><td>|&gt;</td><td>Binary</td><td>Left Type</td><td>Bitwise right bit rotation<sup><a href="#int_operators_foot7">7</a></sup>.</td></tr>
+  <tr><td>Equal</td><td>==</td><td>Binary</td><td><code>bool</code></td><td>True if arguments are equal.</td></tr>
+  <tr><td>Not Equal</td><td>!=</td><td>Binary</td><td><code>bool</code></td><td>True if arguments are not equal.</td></tr>
+  <tr><td>Less Than</td><td>&lt;</td><td>Binary</td><td><code>bool</code></td><td>True if left argument is less than right argument.</td></tr>
+  <tr><td>Greater Than</td><td>&gt;</td><td>Binary</td><td><code>bool</code></td><td>True if left argument is greater than right argument.</td></tr>
+  <tr><td>Less or Equal</td><td>&lt;=</td><td>Binary</td><td><code>bool</code></td><td>True if left argument is less than or equal to right.</td></tr>
+  <tr><td>Greater or Equal</td><td>&gt;=</td><td>Binary</td><td><code>bool</code></td><td>True if left argument is greater than or equal to right.</td></tr>
+</table>
+<div class="footnotes">
+<p><sup><span id="int_operators_foot1">1</span></sup>Modular arithmetic in this case means a very precise mathematical definition of signed and unsigned integer behavior, because the signed integers overflow at -2<sup>(bits-1)</sup>, not 0.</p>
+<p><sup><span id="int_operators_foot2">2</span></sup>Negation in modular arithmetic gets very tricky, becuase abs(INT_MIN) == INT_MAX + 1. As a result, negating INT_MIN will result in INT_MIN, <b>not</b> a positive number!</p>
+<p><sup><span id="int_operators_foot3">3</span></sup>Multiplication and Exponentiation, after taking the proper union of both argument types by applying integer promotion rules, return a type that is <i>twice</i> the size of the union type. Thus, <code>i8 * u16</code> is promoted to <code>i16 * i16</code> and finally returns an <code>i32</code>. <code>i64 * i64</code> will internally return an <code>i128</code>, but that is not a type in Berry, so it will always be implicitly cast back down to <code>i64</code> using truncation.</p>
+<p><sup><span id="int_operators_foot4">4</span></sup>A mathematically correct modulo operation respects all the rules of standard <a href="https://en.wikipedia.org/wiki/Modular_arithmetic">modular arithmetic</a>, such that:
+<br/><code>1 mod 8 == 1</code>
+<br/><code>10 mod 8 == 2</code>
+<br/><code>-1 mod 8 == 7</code></p>
+<p><sup><span id="int_operators_foot5">5</span></sup>A remainder operation is what standard CPU architectures usually support. It is platform-defined, and only behaves like the modulo operator when both types are positive. If one type is negative, it may either take the absolute value of all it's arguments, or it might ignore the sign completely, or do something else entirely. It is included for performance reasons.</p>
+<p><sup><span id="int_operators_foot6">6</span></sup>An arithmetic bit shift preserves the sign-bit when shifting to the right. Instead of filling with 0s, it will fill with whatever the most significant bit of the original integer was (which is the sign bit in two's complement). Because this isn't a problem when left shifting, an arithmetic left shift is the same as a standard bitwise left shift.</p>
+<p><sup><span id="int_operators_foot7">7</span></sup>A bit rotation is similar to a bit shift, but instead of letting bits "fall out", bits that are moved off the left side are shifted into the right side, and bits moved off the right side are shifted to the left. So, a bit rotation <code>1110011 <| 2 == 1001111</code>, and <code>1110011 |> 2 == 1111100</code></p>
+</div>
+<h4 id="float_operators">Floating Point Operators</h4>
+Floating point operators have simpler union operations than integers. The return type is simply the largest floating point type from either argument.
+
+<table>
+  <tr><th>Operator</th><th>Symbol</th><th>Arity</th><th>Returns</th><th>Effect</th></tr>
+  <tr><td>Addition</td><td>+</td><td>Binary</td><td>Union</td><td>Adds arguments together.</td></tr>
+  <tr><td>Subtraction</td><td>-</td><td>Binary</td><td>Union</td><td>Subtracts right argument from left.</td></tr>
+  <tr><td>Negation</td><td>-</td><td>Unary (prefix)</td><td>Union</td><td>Negates the argument.</td></tr>
+  <tr><td>Multiplication</td><td>*</td><td>Binary</td><td>Union</td><td>Multiplies arguments together.</td></tr>
+  <tr><td>Exponentiation</td><td>**</td><td>Binary</td><td>Union</td><td>Exponentiates<sup><a href="#float_operators_foot1">1</a></sup> the left argument with the right argument.</td></tr>
+  <tr><td>Division</td><td>/</td><td>Binary</td><td>Union</td><td>Divides left argument with the right.</td></tr>
+  <tr><td>Modulo</td><td>%</td><td>Binary</td><td>Union</td><td>Mathematically correct<sup><a href="#float_operators_foot2">2</a></sup> floating point modular arithmetic.</td></tr>
+  <tr><td>Remainder</td><td>%%</td><td>Binary</td><td>Union</td><td>Performs a floating point remainder operation<sup><a href="#float_operators_foot3">3</a></sup>.</td></tr>
+  <tr><td>Equal</td><td>==</td><td>Binary</td><td><code>bool</code></td><td>Returns true if floating point numbers are identical<sup><a href="#float_operators_foot4">4</a></sup>.</td></tr>
+  <tr><td>Not Equal</td><td>!=</td><td>Binary</td><td><code>bool</code></td><td>Returns true if floating point nubmers are not identical<sup><a href="#float_operators_foot4">4</a></sup>.</td></tr>
+  <tr><td>Less Than</td><td>&lt;</td><td>Binary</td><td><code>bool</code></td><td>True if left argument is less than right argument.</td></tr>
+  <tr><td>Greater Than</td><td>&gt;</td><td>Binary</td><td><code>bool</code></td><td>True if left argument is greater than right argument.</td></tr>
+  <tr><td>Less or Equal</td><td>&lt;=</td><td>Binary</td><td><code>bool</code></td><td>True if left argument is less than or equal to right.</td></tr>
+  <tr><td>Greater or Equal</td><td>&gt;=</td><td>Binary</td><td><code>bool</code></td><td>True if left argument is greater than or equal to right.</td></tr>
+</table>
+<div class="footnotes">
+<p><sup><span id="float_operators_foot1">1</span></sup>Exponentiation is performed using the standard library pow() function, using the appropriate type overload.</p>
+<p><sup><span id="float_operators_foot2">2</span></sup>This is a modification of the fmod(x,m) algorithm: <code>x - <b>floor</b>(x/m)*m</code></p>
+<p><sup><span id="float_operators_foot3">3</span></sup>This is the standard fmod(x,m) algorithm, using truncation: <code>x - <b>trunc</b>(x/m)*m</code></p>
+<p><sup><span id="float_operators_foot4">4</span></sup>The floating point values must be <i>identical</i>, with no margin for error. This makes the equality operator of dubious use when comparing floating points that have been put through several mathematical operations, as precision limitations will often nudge them slightly away from the exact values. Importantly, the IEEE rules for equality still apply here, which means that <code>NaN</code> does not equal <code>NaN</code>.</p>
+</div>
+<h4 id="slice_operators">Slice Operators</h4>
+These are standard operations that can be performed on any slice, array, or dynamic array. Because strings are dynamic arrays, they also support all these operations.
+<table><tr><th>Operator</th><th>Symbol</th><th>Arity</th><th>Returns</th><th>Effect</th></tr>
+  <tr><td>Concatenate</td><td>+</td><td>Binary</td><td>Array</td><td>Creates a new array containing first the left argument, then the right.</td></tr>
+  <tr><td>Rotate Left</td><td>&lt;|</td><td>Binary</td><td>Array</td><td>Creates a new array with the elements permuted<sup><a href="#slice_operators_foot1">1</a></sup> left</td></tr>
+  <tr><td>Rotate Right</td><td>|&gt;</td><td>Binary</td><td>Array</td><td>Creates a new array with the elements permuted<sup><a href="#slice_operators_foot1">1</a></sup> right</td></tr>
+  <tr><td>Element Access</td><td>[]</td><td>Unary (postfix)</td><td>Element</td><td>Returns a non-nullable reference to the array index.</td></tr>
+  <tr><td>Slice</td><td>[:]</td><td>n-ary (postfix)</td><td>Slice</td><td>Creates a new slice from this slice with the given subset of elements.</td></tr>
+  <tr><td>Increment</td><td>++</td><td>Unary (prefix)</td><td>Slice</td><td>Sets the slice to [1:] and returns the new value.</td></tr>
+  <tr><td>Post-Increment</td><td>++</td><td>Unary (postfix)</td><td>Slice</td><td>Sets the slice to [1:] and returns the old value.</td></tr>
+  <tr><td>Length</td><td>#</td><td>Unary (prefix)</td><td>Integer</td><td>Returns the number of elements in the slice.</td></tr>
+  <tr><td>Equal</td><td>==</td><td>Binary</td><td><code>bool</code></td><td>True if both slices are the same length and each element<sup><a href="#slice_operators_foot2">2</a></sup> is equal.</td></tr>
+  <tr><td>True Equality</td><td>===</td><td>Binary</td><td><code>bool</code></td><td>True only if the slices are pointing to the same location in memory, and are the same length.</td></tr>
+  <tr><td>Not Equal</td><td>!=</td><td>Binary</td><td><code>bool</code></td><td>True if the slices are different lengths, or any element<sup><a href="#slice_operators_foot2">2</a></sup> is not equal.</td></tr>
+  <tr><td>True Not Equality</td><td>!==</td><td>Binary</td><td><code>bool</code></td><td>True do not point to the same memory location or are different lengths.</td></tr>
+</table>
+<div class="footnotes">
+<p><sup><span id="slice_operators_foot1">1</span></sup>A permutation to the left <code>n</code> spaces shifts the elements n spaces to the left, and moves all the elements that are now outside of the slice to the right side, and vice-versa:
+<br/><code>[1,2,3] <| 1 == [2,3,1]</code>
+<br/><code>[2,3,1] <| 1 == [3,1,2]</code>
+<br/><code>[3,1,2] <| 1 == [1,2,3]</code>
+<br/><code>[1,2,3] |> 1 == [3,1,2]</code>
+<br/><code>[3,1,2] |> 1 == [2,3,1]</code>
+<br/><code>[2,3,1] |> 1 == [1,2,3]</code>
+<br/><code></code></p>
+<p><sup><span id="slice_operators_foot2">2</span></sup>The default equal operations first compare the length, and then if that is equal, they go through each element in both arrays, using the equality operator on each one. If the elements cannot be compared, this will cause an error. The equal operator will return true only if all of the equal operators called on all pairs of elements return true. Likewise, the Not Equal operator will return true if any element pair is not equal.</p>
+</div>
+<h4 id="type_operators">Type Operators</h4>
+Certain compile-time operations can be done on types without having to rely on full introspection. None of these operators can be overloaded, because operations on types are done by the compiler.
+
+<table><tr><th>Operator</th><th>Symbol</th><th>Arity</th><th>Returns</th><th>Effect</th></tr>
+  <tr><td>Length</td><td>#</td><td>Unary (prefix)</td><td>Integer</td><td>Returns the size, in bytes, of the type.</td></tr>
+  <tr><td>Ternary</td><td>?:</td><td>Ternary</td><td>Type</td><td>Based on a compile-time boolean, returns the left or right type.</td></tr>
+  <tr><td>Nullable Ref</td><td>@</td><td>Unary (postfix)</td><td>Type@</td><td>Adds a level of nullable indirection to the type.</td></tr>
+  <tr><td>Nonnullable Ref</td><td>$</td><td>Unary (postfix)</td><td>Type$</td><td>Adds a level of non-nullable indirection to the type.</td></tr>
+  <tr><td>Pin Reference</td><td>!</td><td>Unary (postfix)</td><td>Type!</td><td>Creates a type that's pinned to the stack.</td></tr>
+  <tr><td>Equal</td><td>==</td><td>Binary</td><td><code>bool</code></td><td>True if both type expressions refer to the same type.</td></tr>
+  <tr><td>Not Equal</td><td>!=</td><td>Binary</td><td><code>bool</code></td><td>True if the type expressions are not the same type.</td></tr>
+  <tr><td>Less Than</td><td>&lt;</td><td>Binary</td><td><code>bool</code></td><td>True if the right argument implements<sup><a href="#type_operators_foot1">1</a></sup> the left argument.</td></tr>
+  <tr><td>Greater Than</td><td>&gt;</td><td>Binary</td><td><code>bool</code></td><td>True if the left argument implements<sup><a href="#type_operators_foot1">1</a></sup> the right argument.</td></tr>
+  <tr><td>Less or Equal</td><td>&lt;=</td><td>Binary</td><td><code>bool</code></td><td>True if the right argument implements<sup><a href="#type_operators_foot1">1</a></sup> the left argument, or is the same type.</td></tr>
+  <tr><td>Greater or Equal</td><td>&gt;=</td><td>Binary</td><td><code>bool</code></td><td>True if the left argument implements<sup><a href="#type_operators_foot1">1</a></sup> the right argument, or is the same type.</td></tr>
+</table>
+
+<div class="footnotes">
+<p><sup><span id="type_operators_foot1">1</span></sup>A type "implements" another type if it can be found anywhere in it's inheritance chain. This holds true for traits, even though traits are not full types, so these comparison operations can be used on traits as well.</p>
+</div>
+<h4 id="general_operators">General Operators</h4>
+<table><tr><th>Operator</th><th>Symbol</th><th>Arity</th><th>Returns</th><th>Effect</th></tr>
+  <tr><td>Assignment</td><td>=</td><td>Binary</td><td>Type</td><td>Assigns the value on the right to the value on the left. Implicit conversions are applied only to the right argument.</td></tr>
+  <tr><td>Ternary</td><td>?:</td><td>Ternary</td><td>Union</td><td>If the first argument is true, returns the second argument, otherwise returns the third. Has permanent maximum operator precedence and cannot be overloaded.</td></tr>
+  <tr><td>Equal</td><td>==</td><td>Binary</td><td><code>bool</code></td><td>Returns true if both values hold the same value.</td></tr>
+  <tr><td>Not Equal</td><td>!=</td><td>Binary</td><td><code>bool</code></td><td>Returns true if the values hold different values.</td></tr>
+  <tr><td>And</td><td>&&</td><td>Binary</td><td><code>bool</code></td><td>Returns true if both values are true.</td></tr>
+  <tr><td>Or</td><td>||</td><td>Binary</td><td><code>bool</code></td><td>Returns true if either value is true.</td></tr>
+  <tr><td>Not</td><td>!</td><td>Unary (prefix)</td><td><code>bool</code></td><td>Returns true if the value is false, or vice-versa.</td></tr>
+  <tr><td>Address-of</td><td>@</td><td>Unary (prefix)</td><td>Type@</td><td>Returns a reference to the argument. Not overloadable.</td></tr>
+  <tr><td>Dereference</td><td>$</td><td>Unary (prefix)</td><td>Type</td><td>If the argument is a reference, returns what it is referencing. Not overloadable.</td></tr>
+  <tr><td>Resolve</td><td>.</td><td>Binary</td><td>N/A</td><td>Used to resolve scopes, variables, functions, and namespaces. Not overloadable.</td></tr>
+  <tr><td>Resolve Function</td><td>.$</td><td>Binary</td><td>N/A</td><td>Used to invoke a member function pointer on an object. Not overloadable.</td></tr>
+  <tr><td>Extraction</td><td>:&gt;</td><td>Binary</td><td><code>bool</code></td><td>Takes a value from the left argument and puts it in the right.</td></tr>
+  <tr><td>Insertion</td><td>&lt;:</td><td>Binary</td><td><code>bool</code></td><td>Takes a value from the right argument and puts it in the left.</td></tr>
+  <tr><td>Invocation</td><td>()</td><td>n-ary (postfix)</td><td>Type</td><td>Calls a function with n parameters. Can be overidden on objects.</td></tr>
+  <tr><td>Expansion</td><td>...</td><td>Unary (postfix)</td><td>N/A</td><td>Used to specify variadic template argument lists. Not overloadable.</td></tr>
+</table>
+<h3 id="statements">Statements</h3>
+<pre>
+termvardecl : OPERATOR? factor termaftervardecl ;
+termaftervardecl : OPERATOR ( factor termaftervardecl )? | ID ( '=' expr)? | ;
+optstatement : ( termvardecl | lambda ) ';' | forloop | loop | switch | ifgroup | 'static' varbind | 'break' NUMBER? ';' | 'continue' NUMBER? ';' | 'return' expr? ';'  | assert | ';' ;
+statement : optstatement | trycatch ; // we must exclude trycatch from optblock statements
+</pre>
+
+Statements in berry are either bare expressions, assignments, or control flow keywords. A single statement is assumed to have some kind of <i>side-effect</i>, by assigning a value, calling a function, or manipulating the program's control flow. Most statements that do not end in a closing brace <code>}</code> require a semicolon. In some cases, the semicolon can be ignored without causing an ambiguity, but most of the time its required. A semicolon with no associated statement is still valid, so you can always add extra semicolons without causing a syntax error. Most control flow statements allow you to substitute an optional statement in place of a block, but the <a href="try_catch">try/catch</a> statement is not allowed in an optional statement.
+
+<h4 id="forloop">For Loop</h4>
+<pre>forloop : 'for' '(' ( ';' expr? ';' expr? | expr ( ';' expr? ';' expr? | 'in' expr | )  ) ')' optblock ;</pre>
+
+The for loop in Berry is similar to the for loop in Go. It has three forms: The familiar, 3 statement C-style for loop, the foreach loop using the <code>in</code> keyword, and the single statement loop that functions as a C-style <code>while</code> loop. 
+<br/>
+<br/>The three statement for loop is a three stage loop process over a block of code. First, the first expression (if present) will be executed, which often will initialize a variable to a zero value. Then, the second expression (if present) will be evaluated to a boolean value, which is usually a range check. If false, the loop immediately exits and control continues after the loop body. Otherwise, the loop body is then executed. After the loop body has been executed, the third expression (if present) will be executed, which is usually an increment operation. Then, the second expression is checked again, the loop is executed, the third expression is evaluated, then the second expression, until the loop exits. Like most control statements, the loop body can either be a block enclosed in curly braces, or a single statement.
+<br/>
+<br/>For loops are shortcuts for creating loops that have a counter. The first expression initializes the counter, the second one checks to see if the counter has reached a maximum value, and the third increments the counter. While any expression can be null in Berry, the language does not have a comma operator that can be used to chain multiple expressions in the for loop like C. Instead, it's better to simply write a single-statement for loop.
+<pre class="highlight">
+for(int i = 0; i &lt; 5; ++i)
+  callfunc(i);
+for(int i = 0; i &lt; 3; ++i)
+{
+  callfunc(i+3);
+  callfunc(2);
+}</pre>
+The two statement for loop is a foreach loop, which can operate on any expression that can be implicitly converted to a value that implements the <code>Iterable</code> trait. The variable declaration must be either <code>var</code> or any type that the Iterable's value type can be implicitly converted to. The for loop will start at the beginning of the Iterable and call Next() on the Iterable until Next() returns null, at which point it will terminate. In this way, it is gauranteed to iterate over an Iterable starting from the first element and ending on the last element, in whatever order the Iterable enforces. If the Iterable does not enforce any sort of order, the for loop won't either.
+<pre class="highlight">
+template[I, T:Iterable[I]]
+void foreach(T src, fn[void](I) f)
+{
+  I item;
+  for(Iterator[I] iter = src.Iter(); (item = iter.Next()) != null;)
+    f(item);
+}
+
+template[I, I[:]]
+void foreach(I[:] slice, fn(I) f)
+{
+  for(int i = 0; i &lt; #slice; ++i)
+    f(slice[i]);
+}
+
+for(var x in group)
+{
+	callfunc(x)
+}</pre>
+Internally, the compiler attempts to convert the expression to a slice first, because these can be more efficiently iterated over using pointer arithmetic. This optimization cannot be performed if a function is not inlined and takes an iterable, however, because then the code must assume an iterable interface. For the purposes of the language, slices simply implement the Iterable trait, which is why they can be used in the for loop.
+<br/>
+<br/>
+The single statement for loop checks it's condition (which is any expression that evaluates to a value that can be implicitly converted to a bool) at the beginning of the loop, then executes the loop body and checks it's condition again. Once the condition is false, the rest of the body is skipped and control continues after the loop. This is exactly equivilent to a traditional <code>while</code> loop.
+<pre class="highlight">
+var process = Channel[int]();
+
+int a;
+for(a <: process)
+  print(a);</pre>
+<h4 id="loop_while">Loop/While</h4>
+<pre>
+loop : 'loop' block ( 'while' '(' expr ')' ';' | ';') ;
+</pre>
+
+A <code>loop</code> is similar to a single statement for loop, except that the loop body is <i>always executed once</i>, because the condition is only checked at the bottom of the loop body. So, the loop body is run once, and then the condition is checked. If it is true, the loop body is executed again, until the condition is false, at which point control continues after the loop. The condition on a loop is optional and can be replaced with a semicolon (the semicolon is necessary to prevent an ambiguity with the while loop), in which case the loop is an infinite loop and will execute until a <code>return</code> or a <code>break</code> statement is encountered (or an unhandled exception occurs).
+<pre class="highlight">
+int count = 0;
+loop
+{
+  print(count++);
+} while(count < 100)
+
+loop
+{
+  if(count-- > 0)
+    break;
+}
+</pre>
+<h4 id="with_statement">With Statement</h4>
+<pre>with : 'with' '(' expr ')' block ;</pre>
+A with statement makes setting many properties of a single object easier. When inside a <code>with</code> statement, a dot with no preceding ID implies the ID of the resolved expression in the with statement, even if it is a transient object with no concrete identifier. These statements can be nested, but the inner <code>with</code> statement overrides the outer statement, such that the outer expression can no longer be accessed in any way from the inner with statement, unless it's through an explicit identifier.
+
+<pre class="highlight">
+with(func(2,3))
+{
+  .method(.member, 4)
+  .setprop(.x*2)
+  with(.getinner())
+  {
+    .res = .x + .y;
+    //.setprop() doesn't work because the object returned by .getinner() doesn't have this method.
+  }
+}
+</pre>
+<h4 id="switch_statement">Switch Statement</h4>
+<pre>switch : 'switch' '(' expr ')' '{' ( 'case' expr ID? ':' statement* )* '}' ;</pre>
+
+A switch statement in Berry is used to create multiple branches of code based on the value of an expression, which can be an integer, a string, an <a href="#algebriac_types">algebriac type</a>, or any arbitrary expression. The values inside <code>case :</code> labels must resolve to either a compile-time expression, or they must resolve to a type (with an optional alias) if the expression is an algebriac type. Unlike C++, <code>case:</code> blocks create their own scopes, and <b>do not fall through by default</b>. This means you do not need to end a <code>case:</code> block with a <code>break</code> statement. You can create fallthrough logic by using <code>continue</code>, which will jump to the next case statement. <code>continue</code> is not allowed when a switch statement is operating on an algebriac type, although <code>break</code> can still be used.
+
+<pre class="highlight">
+switch(input)
+{
+  case 0:
+    if(!output)
+      break; // Breaks out of the switch statement early
+    continue; // Moves control flow to next case statement
+  case 1:
+    int i = 1; // case statements create their own scopes, so i will be destroyed when the case exits.
+    input += i; // break is implied here
+  case 1+1: // Any expression can be used so long as it can be evaluated at compile-time.
+    input += 2; // break is also implied here
+}
+</pre>
+
+See the section on <a href="#algebriac_types">algebriac types</a> for an example of using a switch statement to evaluate an algebriac type.
+
+<h4 id="if_else">If/else</h4>
+<pre>ifgroup : 'if' '(' expr ')' optblock ( options {greedy=true;} : 'else' 'if' '(' expr ')' optblock)* ( options {greedy=true;} : 'else' optblock)?;</pre>
+Berry has standard if/else statement pairs that operate on any expression that can be implicitly converted to a boolean value. You are allowed to omit the code block for a single statement, which creates the same <a href="http://en.wikipedia.org/wiki/Dangling_else">dangling else</a> ambiguity when inside nested if statements. Berry will simply associate a dangling else with the nearest if statement.
+
+<pre class="highlight">
+if(i &lt; 3)
+  if(i &lt; 2)
+    i += 3;
+  else if(i &lt; 1)
+    i += 5;
+  else // Belongs with the above if statement
+    i += 8;
+else // The above if statement has now been terminated with an else statement, so this else gets attached to the next-nearest if statement, which is the outer one.
+  i += 4;
+</pre>
+
+Once inside an if statement, the optimizer will assume it's condition is true for the entirety of that code block, unless that value is an atomic value (or otherwise marked as being shared between threads).
+<h4 id="variable_binding">Variable Declaration and Binding</h4>
+<pre>
+vartype : type | 'var' ;
+vardecl : vartype ID ;
+strictdecl : type ID ( '=' expr )? ;
+varbind : vardecl ( '=' expr )? ';' ;
+</pre>
+
+Variables are declared either with a type, or with the 'var' keyword, which will infer the type based on the assignment. Because of this, you can't use 'var' in any context where it is impossible to infer the type. Variables inside classes can be made static, and all variable bindings can have attributes attached to them. You can declare a variable without assigning a type to it, provided you assign the type later before using it. Initializing a new variable is done by assigning it to a constructor call. The compiler will detect that you are assigning a new constructed object to one that hasn't been initialized yet, so it will skip the destructor and simply call the constructor directly.
+<pre class="highlight">
+MyType cls = MyType("param");
+</pre>
+<h4 id="break_continue">Break/Continue</h4>
+The <code>break</code> statement's behavior depends on it's context. Inside any sort of loop, it will immediately exit that loop. Inside a switch statement, it will immediately exit the entire switch statement. The <code>continue</code> statement is similar: Inside any sort of loop, it will jump to the beginning of the loop and evaluate it's condition again. Inside a switch statement, however, it will <i>skip to the next case statement</i>. Because case statements in Berry do not allow fallthroughs by default, <code>continue</code> can be used to implement fallthrough logic where necessary.
+<br/>
+<br/>Both <code>break</code> and <code>continue</code> take optional constant integers as arguments. Omitting these arguments implies a value of 0. The integer signifies the number of enclosing loops or switch statements to jump out of. A break 1; statement inside a switch statement, for example, will break out of both the switch statement and the while loop it is contained in. A continue 2; statement will break out of the for loop it's in, the while loop it's in, and then jump to the next case label in the containing switch statement. <code>continue</code> is not allowed in a switch statement that operates on an algebriac type instead of an expression and will cause a compiler error if used. However, an algebriac type switch statement still counts as an enclosing switch statement for <code>continue #</code>.
+
+<pre class="highlight">
+int j = 9;
+while(true)
+{
+  j = (j &lt;| 18);
+  switch(j)
+  {
+    case 1:
+      break; // Breaks out of this switch statement
+    case 2:
+      continue 1; // Continues at the beginning of the while loop
+    case 3:
+      break 1; // Breaks out of the while loop
+      // break 2; // compile error
+  }
+}
+</pre>
+<h4 id="return">Return</h4>
+A return statement exits the current function, unwinds the stack and returns execution flow to the caller. If the function has no return value, return must not have an associated expression. If it does have a return value, the expression must evaluate to a value that can be implicitly converted to the return value.
+<h4 id="try_catch">Try/Catch</h4>
+<pre>trycatch : 'try' block ( 'catch' '(' strictdecl ')' block )* ( 'else' block )? ( 'finally' block )? ;</pre>
+Exception handling in Berry is fairly standard. All exceptions must implement the <a href="#trait_exception">Exception</a> trait, and exceptions that are thrown are allocated on a special stack contained in the heap that is managed by the compiler. Exceptions are only valid inside a try/catch/finally block. While inside a series of catch/throw statements (which one might call playing exception baseball), all the exceptions that have been thrown so far are always valid, so they can be aggregated into a single larger exception until something finally deals with it (or the program crashes). These statements are the only ones that are not allowed to replace blocks in control flow statements.
+<br/>
+<br/>The precise mechanics of a try/catch/finally statement are as follows: Code is first executed in the try statement. If an exception occurs anywhere in the try statement, the stack is unwound and then all possible catch statements are examined. Any catch statement that matches the exception is then executed, unless there are no matching catch statements, in which case the exception is thrown again. The finally block is <i>always</i> executed even if an exception was thrown in the catch statement or no exception happened in the try statement. This execution happens before the stack is unwound to the next exception handler, if necessary. The <code>else</code> block is executed before the <code>finally</code> block, but <i>only</i> if no exception was thrown.
+<pre class="highlight">
+Stream s;
+try
+{
+  s = doio("file.dat");
+}
+catch(AccessViolationException e)
+{
+  throw;
+}
+catch(Exception e) // captures all other possible exceptions
+{
+  log("something bad happened");
+}
+else // Nothing bad happened, so write to the file before we close it
+{
+  s <: "stuff";
+}
+finally // Always executed no matter what happens
+{
+  if(s != null) closefile(s);
+}
+</pre>
+
+Catch statements match the most specific exception first, and then work backwards. If an exception inherits another exception, the subclassed exception will be matched first because it is more specific. Thus, <code>Exception e</code> matches <i>all</i> exceptions, and will only be used after all other catch statements have been exhausted.
+<h4 id="initializer_lists">Initializer Lists</h4>
+Berry supports two kinds of initializer lists, C style initializer lists, or C# style named initializer lists. They are always a fully qualified type followed by curly braces. If no identifiers are used, Berry will simply try to fill in the class members in order, throwing an error if there is a type mismatch or too many elements. Any elements not initialized are always initialized to their default values.
+<br/>
+<br/>If identifiers are used, the appropriate element is initialized, and any elements that were not included have their default constructors called. These initializer lists can be nested.
+<pre class="highlight">
+var a = MyClass[]{ MyClass{ Val = true, Num = 3 }, MyClass{ Val = false }, MyClass{ false, 4 } };
+</pre>
+<h3>Exception Model</h3>
+In Berry, you can never allow an unhandled exception to propagate through a destructor (as this would make it impossible to destruct the object). Calling a function that could throw an exception in a destructor is only permissable if the exception is caught and handled before the destructor exits. If the compiler detects an unhandled exception in a destructor, it will throw a compiler error. For this same reason, free() cannot throw an exception.
+<br/>
+<br/>In addition to this, if a function throws an exception and no codepath that calls it catches that exception or <i>could</i> catch that exception, then all the traditional exception handling code for that exception should be removed, and it should simply crash the entire program immediately by raising an unhandled exception. If all possible exceptions have no handlers, then even the stack unwinding code should be removed, so that there is absolutely no runtime penalty whatsoever.
+<br/>
+<br/>As a result of this behavior, there is one important exemption from the "no unhandled exceptions allowed in destructors" rule stated above: An exception is allowed in a destructor if and only if it is reduced to an unhandled exception that immediately crashes the entire program. The reasoning here is that unhandled exceptions are forbidden in destructors because they will always put the program into an undefined state. However, if the <i>entire program</i> will crash if an exception is thrown, then whether or not the program is in an undefined state doesn't matter, because it's no longer running.
+
+<h2 id="parsing">Parsing</h2>
+
+<h3 id="lexical_structure">Lexical Structure</h3>
+Berry code is interpreted as a sequence of UTF-8 encoded unicode characters. Unescaped NUL values (ascii character 0) are not permitted in the source code character sequence. While all english Berry tokens and operators are defined used ascii characters only, the lexer must assume any valid UTF-8 character string could be a token. This allows international langauge packages to include alternative keywords that can be translated into the appropriate tokens on compilation. The language is designed such that any text parsing can simply interpret a UTF8-encoded value as a string of bytes, without any knowledge of the corresponding unicode characters. Thus, parsers only have to support high-ascii values when manipulating Berry code. Outside of <code>string16</code> and <code>string32</code> conversions, <b>Berry does not understand the unicode standard</b> and no part of the language requires interpreting unicode characters.
+<h4 id="identifiers">Identifiers</h4>
+<pre>ID ::= [^!"#$%&'()*+,\-./:;<=>?@[\\\]^`{|}~ \t\r\n\f]+</pre>
+An identifier is any series of characters that aren't punctuation, whitespace, or non-printing control characters. While all tokens in Berry are either valid identifiers, or punctuation, the lexer will only generate an IDENTIFIER token if it is not a reserved word. All reserved words are transformed into their appropriate tokens by the lexer before being passed to the parser.
+<blockquote><b>Note:</b> There is one exception to this rule: <code>in</code> is not considered a reserved word unless it's inside a for loop. Thus, either the lexer can attempt to scope the for declaration, or it can simply pass "in" as an identifier that the parser translates to a token once it processes the for loop.</blockquote>
+<h4 id="lexer_numbers">Numbers</h4>
+<pre>NUMBER ::= ([0-9]+(\.[0-9]+)?([eE]-?[0-9]+)?|0x[0-9A-Fa-f]+|0b[01]+|0o[0-7]+)[^!"#$%&'()*+,\-./:;<=>?@[\\\]^`{|}~ \t\r\n\f]+</pre>
+Berry defines 5 classes of numeric constants. All numeric constants can have an arbitrary alphanumeric suffix, but only floating point or integral numbers may have the exponential suffix.
+<table>
+  <tr>
+    <th>Class</th>
+    <th>Format</th>
+    <th>Additional Suffixes</th>
+  </tr>
+  <tr>
+    <td>Decimal</td>
+    <td>2748</td>
+    <td>Exponentiation</td>
+  </tr>
+  <tr>
+    <td>Floating Point</td>
+    <td>24.18</td>
+    <td>Exponentiation</td>
+  </tr>
+  <tr>
+    <td>Hex</td>
+    <td>0xffFF</td>
+    <td>None</td>
+  </tr>
+  <tr>
+    <td>Binary</td>
+    <td>0b11110000</td>
+    <td>None</td>
+  </tr>
+  <tr>
+    <td>Octal</td>
+    <td>0o77</td>
+    <td>None</td>
+  </tr>
+</table>
+
+<h4 id="lexer_operators">Operators</h4>
+<pre>OPERATOR ::= [^!"#$%&'()*+,\-./:;<=>?@[\\\]^`{|}~]+</pre>
+An operator in Berry is simply any combination of punctuation characters. Certain punctuation characters, in isolation, are built-in operators that can be classified as tokens when appropriate, but this can only be done by the lexer as an optimization. Because Berry allows user-defined operators, any sequence of punctuation characters could be a set of potential operators that are context-dependent. Thus, all contiguous sequences of punctuation characters are interpreted as a single OPERATOR token by the lexer. The parser does the work of seperating the operators and determining if they are valid (see <a href="#operator_resolution">Operator Resolution</a>).
+
+<h4 id="lexer_strings">Strings</h4>
+<pre>STRING ::= '"' [^"]* '"'</pre>
+A string in berry is a sequence of characters that begins with <code>"</code>, which may contain any character, including <i>all whitespace characters</i>, but not any non-printing control characters or <code>"</code>. Because newline characters are whitespace, this means <b>strings may span multiple lines</b> in the code file and contain unescaped tabs, newlines, carriage returns, etc. <code>"</code> (double-quote) is used to end the string, while <code>\</code> (backslash) is used to signify an escape character. The following escape characters are supported inside strings:
+<table>
+  <tr>
+    <th>Code</th>
+    <th>Hex Value</th>
+    <th>Name</th>
+  </tr>
+  <tr><td>\0</td><td>0x00</td><td>NULL</td></tr>
+  <tr><td>\r</td><td>0x0D</td><td>Carriage return</td></tr>
+  <tr><td>\n</td><td>0x0A</td><td>Newline</td></tr>
+  <tr><td>\"</td><td>0x22</td><td>Double quote</td></tr>
+  <tr><td>\'</td><td>0x27</td><td>Single quote</td></tr>
+  <tr><td>\\</td><td>0x5C</td><td>Backslash</td></tr>
+  <tr><td>\t</td><td>0x09</td><td>Horizontal Tab</td></tr>
+  <tr><td>\b</td><td>0x08</td><td>Backspace</td></tr>
+  <tr><td>\f</td><td>0x0C</td><td>Form feed</td></tr>
+  <tr><td>\v</td><td>0x0B</td><td>Vertical Tab</td></tr>
+  <tr><td>\u####</td><td>0x####</td><td>UTF-8 encoded Unicode character</td></tr>
+</table>
+
+<blockquote><b>Note:</b> An unescaped, raw NUL character cannot appear in a string, because they are not allowed to appear anywhere in a Berry source code file. However, Berry still allows null characters inside strings, and they can be inserted using <code>\0</code>. See the <a href="#string_primitives">string primitive</a> for more information.</blockquote>
+<h4 id="lexer_characters">Characters</h4>
+<pre>CHARACTER ::= '\'' [^']+ '\''</pre>
+A character behaves the exact same way that a string does, except that it allows <code>"</code> and disallows <code>'</code>. This means a character string is still utf-8 encoded, and can span multiple lines. The lexer will accept a character string of any length. However, the parser will reject any character that does not correspond to a <b>single unicode codepoint</b> that can be stored in a 32-bit integer after all escape characters have been evaluated. Some characters are actually made up of multiple codepoints and cannot be represented using a character string.
+<br/>
+<br/>Internally, a character string will always evaluate to either an 8-bit signed integer or a 32-bit signed integer. If it evaluates to an ascii character (it's numeric value is 127 or less), it will resolve to an 8-bit signed integer. Otherwise, it will resolve to a 32-bit signed integer.
+<h4 id="lexer_macro_embeds">Macro Expressions</h4>
+<pre>MACRO ::= '`' [^`]+ '`'</pre>
+A macro expression is any piece of code contained inside backtick characters. Backtick characters are forbidden in the rest of the langauge grammar, so there can be no confusion about where the macro starts and stops. Macro expressions implicitely concentate with nearby macro expressions, as detailed in <a href="#macros">Macros</a>.
+<h3 id="parsing_stages">Stages</h3>
+<h3 id="ambiguity_resolution">Ambiguity Resolution</h3>
+<h3 id="formal_grammar">Formal Grammar</h3>
+The complete formal grammar for Berry (using regular expressions to describe tokens used by the lexer) is <a href="./berry.g">available here</a>. <!--reproduced in it's entirety below:
+<pre id="formatted_grammar_replace"></pre>-->
+<h2>Standard Library</h2>
+Berry does not attempt to provide an exhaustive standard library, but as much of the language as possible is implement using Berry itself. This includes standard traits, data structures, and language objects.
+<h3>Traits</h3>
+Berry provides several standard traits used by the language. The <code>for</code> loop works on Iterables, and exceptions must follow the <code>Exception</code> trait at a bare minimum.
+<h4>Iterator/Iterable</h4>
+<pre class="highlight">
+template[T]
+trait Iterator
+{
+  T@ Next();
+}
+
+template[T]
+trait Iterable
+{
+  Iterator[T] Iter();
+}
+</pre>
+<h4>Allocator/StaticAllocator</h4>
+<h4>Exception</h4>
+<h3>Data Structures</h3>
+<h4>DynArray</h4>
+<h4>Stack</h4>
+<h4>Queue</h4>
+<h4>Heap</h4>
+<h4>Hash</h4>
+<h4>Priority Queue</h4>
+<h4>Disjoint Set</h4>
+<h3>Language Objects</h3>
+<h4>Stream</h4>
+<h4>Thread</h4>
+<h4>Channel</h4>
+<pre class="highlight">
+template[T]
+trait Channel
+{
+  void Push(const T push);
+  bool Pull(T$ value);
+  
+  uint op#() const;
+  static bool op:>(const T push, Channel@ right); // a :> c
+  static bool op<:(T$ pull, Channel@ right); // a <: c
+  static bool op:>(Channel@ left, T$ pull); // c :> a
+  static bool op<:(Channel@ left, const T push); // c <: a
+  Channel op=(Channel@ move);
+}
+</pre>
+Channels in Berry are thread-safe queues that can hold arbitrary values. You can put values in them, references in them, or even slices, and pull them out in another thread. This can be used to efficiently synchronize any number of threads. Channels with raw values in them will copy the values into the queue and then out of the queue. Channels with <i>references</i> require that the reference is never used again once passed into the queue, so that when it is taken out it can be properly deallocated (if you do need to do something more complicated you will have to do manual memory management). Channels with slices will copy over the content of the slice. The extraction operator always returns a <i>reference</i>, which will be <code>null</code> if there is nothing left to extract.
+
+<pre class="highlight">
+var c = Berry.Channel[int]();
+
+c &lt;: 3;
+c &lt;: 5;
+
+int a;
+while(c :&gt; a)
+{
+  print(a);
+}
+</pre>
+<h4>Functional</h4>
+<h5>Delegate</h5>
+<h5>Functor</h5>
+<h5>Defer</h5>
+A Defer object can be created inside a scope by assigning it a function invocation. When the object is destroyed after it goes out of scope, it calls the function with the supplied arguments. You can create an empty Defer object anywhere in a function and assign it a function later. An empty Defer will simply do nothing when it is destroyed.
+
+<pre class="highlight">
+template[T:Callable]
+class Defer
+{
+  Defer() : _f(null) {}
+  Defer(T f) : _f(f) {}
+  ~Defer() { if(_f) _f(); }
+  
+private:
+  T _f;
+}
+</pre>
+<h4>Atomic</h4>
+<h4>Standard Allocators</h4>
+<h5>Fixed</h5>
+<h5>Greedy</h5>
+<h5>Circular</h5>
+<h3>CStdLib</h3>
+Berry provides an easy interface to standard C library functions, which are simply thin wrappers over the actual calls that re-interprete Berry types in a way that C understands. Currently, the following functions from the C standard library are included:
+<pre>
+memchr
+memcmp
+memcpy
+memmove
+memset
+realloc
+malloc
+free
+abs
+div
+atof
+atoi
+atol
+strcmp
+stricmp
+</pre>
+<h2>Compiler</h2>
+<h3>Behavior</h3>
+<h3>Transformations</h3>
+<h3>Static Analysis</h3>
+<h3>Foreign Function Interface</h3>
+<h4>C Interface</h4>
+<h4>C++ Binding</h4>
+<h4>Rust Binding</h4>
+<h4>.net Binding</h4>
+<h2>FAQ</h2>
+This is a collection of frequently asked questions about Berry, and addresses some of the rationales behind the language design.
+<h3>Where Is GoTo?</h3>
+GoTo actually can't be implemented in Berry without severely crippling the static analyser. This is because a GoTo could, for example, jump into a while loop without checking its conditions. The requirement of labels also cause serious problems in the language grammar - while not insurmountable, implementing GoTo would inevitably come at a significant cost. It may come as a surprise to many that GoTo actually has several reasonable use cases, often when dealing with complex retry situations that involve delicate ordering of atomic operations. Thus, GoTo itself is not necessarily bad despite the universal hatred it is subjected to by most programmers, but Berry cannot easily implement it. Thus, in recognition of most programmers who hate it anyway (even if they do for questionable reasons), it has simply been left out of the language.
+<footer>
+Copyright ©2016 Black Sphere Studios. Licensed under the <a href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International</a> license.
+<br/>
+<br/>This file may not be copied, modified, or distributed except according to those terms.
+</footer>
+
+<script type="text/javascript">
+ "use strict";
+  var v = document.getElementsByClassName("highlight");
+  var types = /(\W)(i8|i16|i32|i64|u8|u16|u32|u64|float|double|string|string16|string32|void|bool|char|byte|int|uint|f16|f32|f64)(\W)/g;
+  var keywords = /(\W)(return|if|else|for|while|with|loop|switch|case|break|continue|pure|const|unsafe|template|type|assert|assume|default|var|using|virtual|inline|static|namespace|class|enum|abstract|trait|null|try|catch|finally|fn|impl|import|private|public|true|false)(\W)/g;
+
+  for(var i = 0; i < v.length; ++i)
+  {
+    v[i].innerHTML = " " + v[i].innerHTML + " ";
+    v[i].innerHTML = v[i].innerHTML.replace(types, "$1<span berrygggclass=\"berrytype\">$2</span>$3");
+    v[i].innerHTML = v[i].innerHTML.replace(keywords, "$1<span class=\"berryword\">$2</span>$3");
+    v[i].innerHTML = v[i].innerHTML.replace(/berrygggclass/ig, "class");
+    v[i].innerHTML = v[i].innerHTML.replace(/(\/\/.*)$/gm, "<span class=\"berrycomment\">$1</span>");
+    v[i].innerHTML = v[i].innerHTML.replace(/\/\*[^*]*\*\//g, "<span class=\"berrycomment\">$&</span>");
+    v[i].innerHTML = v[i].innerHTML.substr(1);
+  }
+  var t = document.getElementsByTagName("code");
+  for(var i = 0; i < t.length; ++i)
+  {
+    t[i].innerHTML = " " + t[i].innerHTML;
+    t[i].innerHTML = t[i].innerHTML.replace(types, "$1<span berrygggclass=\"berrytype\">$2</span>$3");
+    t[i].innerHTML = t[i].innerHTML.replace(keywords, "$1<span class=\"berryword\">$2</span>$3");
+    t[i].innerHTML = t[i].innerHTML.replace(/berrygggclass/ig, "class");
+    t[i].innerHTML = t[i].innerHTML.substr(1);
+  }
+  
+  var allnodes = document.getElementsByTagName('body')[0].childNodes;
+
+  var lists = [];
+  for(var i = 0; i < allnodes.length; ++i)
+  {
+    var name = allnodes[i].nodeName.toLowerCase();
+    var cur = 0;
+    if(name === 'h1') { cur = 1; }
+    else if(name === 'h2') { cur = 2; }
+    else if(name === 'h3') { cur = 3; }
+    else if(name === 'h4') { cur = 4; }
+    else if(name === 'h5') { cur = 5; }
+    else if(name === 'h6') { cur = 6; }
+    else { continue; }
+    
+    var l = lists;
+    //var id = "";
+    for(var j = 1; j < cur; ++j)
+    {
+      l = l[l.length-1].list;
+      //id = id + "_" + (l.length + ((j+1)===cur?1:0));
+    }
+    l.push({n:allnodes[i].innerHTML, list:[], id:allnodes[i].id});
+  }
+  
+  var out = "";
+  
+  function gentable(x, id)
+  {
+    out += '<li><a href="#' + x.id + '">' + x.n + '</a>';
+    if(x.list.length > 0)
+    {
+      out += '<ol>';
+      for(var i = 0; i < x.list.length; ++i)
+      {
+          gentable(x.list[i], id + "_" + (i+1));
+      }
+      out += '</ol>';
+    }
+    out += '</li>';
+  }
+  
+  for(var i = 0; i < lists[0].list.length; ++i)
+  {
+    gentable(lists[0].list[i], '' + (i+1));
+  }
+  
+  document.getElementById('tableofcontents').innerHTML = out;
+
+  /*{
+    var client = new XMLHttpRequest();
+    client.open('GET', './berry.g');
+    client.onreadystatechange = function() {
+      document.getElementById('formatted_grammar_replace').innerHTML = client.responseText;
+    }
+    client.send();
+  }*/
+</script>
+</body>
+</html>
+  
