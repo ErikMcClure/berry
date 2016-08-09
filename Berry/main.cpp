@@ -71,7 +71,7 @@ int app(int argc, char** argv)
   BuildAST(p);
   DumpAST(p, std::fstream(out + ".ast.xml", std::ios_base::trunc | std::ios_base::out));
   GatherTypes(p);
-  ConstructTypes(p);
+  ResolveTypes(p);
   Resolve(p);
   DumpAST(p, std::fstream(out + ".resolved.xml", std::ios_base::trunc | std::ios_base::out));
   //ResolveAST(p);

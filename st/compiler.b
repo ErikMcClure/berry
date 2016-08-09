@@ -2,32 +2,25 @@
 // For conditions of distribution and use, see copyright notice in LICENSE.txt
 
 // Define fundamental traits and implement them on base types
-trait integral {};
-trait sint_t {};
-trait uint_t {};
-trait fp_t {};
+trait Integral : __trivial_copy, __trivial_move, __byte_comparable {};
+trait sint_t : Integral {};
+trait uint_t : Integral {};
+trait fp_t : __trivial_copy, __trivial_move {};
 trait unsafe_pointer_t {};
+trait __trivial_copy {};
+trait __trivial_move {};
+trait __byte_comparable {};
 
 impl i8:sint_t;
-impl i8:integral;
 impl i16:sint_t;
-impl i16:integral;
 impl i32:sint_t;
-impl i32:integral;
 impl i64:sint_t;
-impl i64:integral;
 impl int:sint_t;
-impl int:integral;
 impl u8:uint_t;
-impl u8:integral;
 impl u16:uint_t;
-impl u16:integral;
 impl u32:uint_t;
-impl u32:integral;
 impl u64:uint_t;
-impl u64:integral;
 impl uint:uint_t;
-impl uint:integral;
 
 impl f16:fp_t;
 impl f32:fp_t;
@@ -119,27 +112,27 @@ template[T = uint, U:unsafe_pointer_t]
 U op(T i) { U v; llvm { %v = inttoptr T %i to U } return v; }
 
 // Arithmetic and comparison operations
-template[T:integral]
+template[T:Integral]
 T op+(T l, T r) { T v; llvm { %v = add T %l, %r } return v; }
-template[T:integral]
+template[T:Integral]
 T op-(T l, T r) { T v; llvm { %v = sub T %l, %r } return v; }
-template[T:integral]
+template[T:Integral]
 T op*(T l, T r) { T v; llvm { %v = mul T %l, %r } return v; }
-template[T:integral]
+template[T:Integral]
 T op<<(T l, T r) { T v; llvm { %v = shl T %l, %r } return v; }
-template[T:integral]
+template[T:Integral]
 T op>>(T l, T r) { T v; llvm { %v = lshr T %l, %r } return v; }
-template[T:integral]
+template[T:Integral]
 T op>>>(T l, T r) { T v; llvm { %v = ashr T %l, %r } return v; }
-template[T:integral]
+template[T:Integral]
 T op&(T l, T r) { T v; llvm { %v = and T %l, %r } return v; }
-template[T:integral]
+template[T:Integral]
 T op|(T l, T r) { T v; llvm { %v = or T %l, %r } return v; }
-template[T:integral]
+template[T:Integral]
 T op^(T l, T r) { T v; llvm { %v = xor T %l, %r } return v; }
-template[T:integral]
+template[T:Integral]
 bool op==(T l, T r) { bool v; llvm { %v = icmp eq T %l, %r } return v; } // Note: A bool is an i1 type in LLVM
-template[T:integral]
+template[T:Integral]
 bool op!=(T l, T r) { bool v; llvm { %v = icmp ne T %l, %r } return v; }
 
 template[T:uint_t]
@@ -192,19 +185,19 @@ template[T:fp_t]
 bool op<=(T l, T r) { bool v; llvm { %v = fcmp ule T %l, %r } return v; }
 
 // Atomic operations
-template[T:integral]
+template[T:Integral]
 T atomic_xchg(T@ p, T v, AtomicOrdering o = AtomicOrdering.seq_cst) { T r; llvm { %r = atomicrmw xchg T* %p, T %v o } return r; }
-template[T:integral]
+template[T:Integral]
 T atomic_add(T@ p, T v, AtomicOrdering o = AtomicOrdering.seq_cst) { T r; llvm { %r = atomicrmw add T* %p, T %v o } return r; }
-template[T:integral]
+template[T:Integral]
 T atomic_sub(T@ p, T v, AtomicOrdering o = AtomicOrdering.seq_cst) { T r; llvm { %r = atomicrmw sub T* %p, T %v o } return r; }
-template[T:integral]
+template[T:Integral]
 T atomic_and(T@ p, T v, AtomicOrdering o = AtomicOrdering.seq_cst) { T r; llvm { %r = atomicrmw and T* %p, T %v o } return r; }
-template[T:integral]
+template[T:Integral]
 T atomic_nand(T@ p, T v, AtomicOrdering o = AtomicOrdering.seq_cst) { T r; llvm { %r = atomicrmw nand T* %p, T %v o } return r; }
-template[T:integral]
+template[T:Integral]
 T atomic_or(T@ p, T v, AtomicOrdering o = AtomicOrdering.seq_cst) { T r; llvm { %r = atomicrmw or T* %p, T %v o } return r; }
-template[T:integral]
+template[T:Integral]
 T atomic_xor(T@ p, T v, AtomicOrdering o = AtomicOrdering.seq_cst) { T r; llvm { %r = atomicrmw xor T* %p, T %v o } return r; }
 template[T:sint_t]
 T atomic_max(T@ p, T v, AtomicOrdering o = AtomicOrdering.seq_cst) { T r; llvm { %r = atomicrmw max T* %p, T %v o } return r; }
@@ -215,7 +208,24 @@ T atomic_max(T@ p, T v, AtomicOrdering o = AtomicOrdering.seq_cst) { T r; llvm {
 template[T:uint_t]
 T atomic_min(T@ p, T v, AtomicOrdering o = AtomicOrdering.seq_cst) { T r; llvm { %r = atomicrmw umin T* %p, T %v o } return r; }
 
-//template[T:integral]
+//template[T:Integral]
 //T atomic_cmpxchg(T* p, T c, T n, AtomicOrdering fail, AtomicOrdering success) { T r; llvm { %r = cmpxchg T* p, T c, T n success fail } return r; }
-//template[T:integral]
+//template[T:Integral]
 //T atomic_cmpxchg_weak(T* p, T c, T n, AtomicOrdering fail, AtomicOrdering success) { T r; llvm { %r = cmpxchg weak T* p, T c, T n success fail } return r; }
+
+template[T]
+void __foreach(Iterable[T] src, fn[void](T@) f)
+{
+  Iterator[T] iter = src.Iter();
+  T@ item;
+  
+  while((item = iter.Next()) != null)
+    f(item);
+}
+
+template[Slice[T]]
+void __foreach(T[:] slice, fn[void](T@) f)
+{
+  for(int i = 0; i < #slice; ++i)
+    f(slice[i]);
+}

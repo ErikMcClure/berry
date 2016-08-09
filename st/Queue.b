@@ -4,27 +4,24 @@
 namespace Berry {
   // Queue implementation based on circular array
   template[T]
-  class Queue : protected CircularArray[T]
+  class Queue : private CircularArray[T]
   {
-    Queue(const Queue r) : CircularArray(r) {}
-    Queue(Queue$ r) : CircularArray(r) {}
-    Queue(p_uint init=0) : CircularArray(init) {}
+    Queue(uint n=0) : CircularArray(n) {}
     ~Queue() {}
-    void Push(const T value) { if(_len>=#_a) resize(fbnext(_len)); CircularArray.push(value); }
+    void Push(const T value) { if(_length>=_capacity) Capacity(fbnext(_length)); CircularArray.push(value); }
     T Pop() { return CircularArray.Pop(); }
-    T Peek() { return CircularArray.Back(); }
-    const T Peek() const { return CircularArray.Back(); }
-    void Discard() { --_len; }
-    bool IsEmpty() { return !_len; }
+    T Peek() { return CircularArray.op[](-1); }
+    const T Peek() const { return CircularArray.op[](-1); }
+    void Discard() { CircularArray.DiscardBack(); }
+    bool IsEmpty() { return _length == 0; }
     void Clear() { CircularArray.Clear(); }
-    p_uint Capacity() const { return CircularArray.Capacity(); }
-    p_uint Length() const { return _len; }
-
-    Queue$ op<<(const T v) { push(v); return this; }
-    Queue$ op>>(T@ v) { v=pop(); return this; }
-    T op~() const { return peek(); }
-    Queue$ op=(const Queue r) { CircularArray.op=(r); return this; }
-    Queue$ op=(Queue$ r) { CircularArray.op=(r); return this; }
-    p_uint op#() const { return _len; }
+    property uint Capacity() const { return _capacity; }
+    property uint Capacity(uint capacity) { return CircularArray.Capacity = capacity; }
+    property uint Length() const { return _length; }
+    
+    Queue$ op<:(const T v) { Push(v); return this; }
+    Queue$ op:>(T@ v) { v=Pop(); return this; }
+    T op~() const { return Peek(); }
+    uint op#() const { return _length; }
   }
 }

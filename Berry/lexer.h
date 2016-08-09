@@ -10,7 +10,7 @@
 typedef unsigned short TOKENID;
 typedef unsigned __int64 ID;
 typedef unsigned __int64 TypeID;
-typedef unsigned __int64 UniqueID;
+typedef unsigned __int64 Monotype;
 
 enum Tokens : TOKENID {
   T_ID=0,
@@ -63,6 +63,7 @@ enum Tokens : TOKENID {
   T_VIRTUAL,
   T_WHILE,
   T_WITH,
+  T_PROPERTY,
   T_UNDERSCORE, // _ (a solitary underscore is a reserved symbol)
   T_PRIVATEBLOCK, // private:
   T_PUBLICBLOCK, // public:
@@ -116,7 +117,7 @@ enum RawTypes {
   TY_FUNC,
   TY_ALGEBRIAC,
   TY_NAMESPACE,
-  TY_PLACEHOLDER, // Used for template placeholder types
+  TY_POLYTYPE, // Used for template placeholder types
   TY_NUMTYPES
 };
 

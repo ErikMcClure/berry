@@ -13,19 +13,19 @@ void EmitError(Program& p, const char* s, TOKEN*& t)
 
 Node* CreateNode(SYNTAX_PART s)
 {
-  Node* n = new Node(s);
+  Node* n = new Node(s, 0);
   n->node.typeset<Node::NODES>();
   return n;
 }
 
 Node* CreateNodeID(SYNTAX_PART s, ID id)
 {
-  return new Node(s, id);
+  return new Node(s, id, 0);
 }
 
 Node* CreateNodeStr(SYNTAX_PART s, cStr&& str)
 {
-  return new Node(s, std::move(str));
+  return new Node(s, std::move(str), 0);
 }
 
 void DiscardToken(TOKEN*& t, Tokens target)
@@ -373,15 +373,6 @@ Node* parse_rawtype(Program& p, TOKEN*& t)
   return n;
 }
 
-bool IsTypeID(Node* n)
-{
-  return n->s == SYNTAX_TYPE &&
-    n->nodes().Length() == 1 &&
-    n->nodes()[0]->s == SYNTAX_DOTTYPE &&
-    n->nodes()[0]->nodes().Length() == 1 && 
-    n->nodes()[0]->nodes()[0]->s == SYNTAX_VALUE_ID;
-}
-
 Node* parse_dottype(Program& p, TOKEN*& t)
 {
   Node* n = CreateNode(SYNTAX_DOTTYPE);
@@ -701,7 +692,7 @@ Node* parse_template(Program& p, TOKEN*& t)
 
 Node* parse_funcmod(Program& p, TOKEN*& t)
 {
-  if(t->token == T_STATIC || t->token == T_PURE || t->token == T_VIRTUAL || t->token == T_ABSTRACT)
+  if(t->token == T_STATIC || t->token == T_PURE || t->token == T_VIRTUAL || t->token == T_ABSTRACT || t->token == T_PROPERTY)
     return CreateNodeID(SYNTAX_TOKEN, t->token);
 
   return 0;
@@ -777,7 +768,7 @@ Node* parse_forloop(Program& p, TOKEN*& t)
 
   ExpectToken(p, ++t, T_LPAREN);
   Node* first = parse_expr(p, t);
-  n->nodes().Add(first); // Add this node even if it's null
+  n->AddNullNode(first);
   if(first != nullptr)
   {
     switch(t->token)
@@ -795,9 +786,9 @@ Node* parse_forloop(Program& p, TOKEN*& t)
     }
   } // Otherwise this is a standard for loop
   ExpectToken(p, t, T_SEMICOLON);
-  n->nodes().Add(parse_expr(p, t));
+  n->AddNullNode(parse_expr(p, t));
   ExpectToken(p, t, T_SEMICOLON);
-  n->nodes().Add(parse_expr(p, t));
+  n->AddNullNode(parse_expr(p, t));
   ExpectToken(p, t, T_RPAREN);
   n->AddNode(parse_optblock(p, t));
   return n;
@@ -1084,6 +1075,28 @@ Node* parse_block(Program& p, TOKEN*& t)
   return n;
 }
 
+Node* parse_impl(Program& p, TOKEN*& t)
+{
+  CALLFAILURE(T_IMPL);
+  Node* n = CreateNode(SYNTAX_IMPL);
+  n->AddNode(parse_dottype(p, t));
+  if(extract_op(t, T_COLON))
+  {
+    ExpectExtractOp(p, t, T_COLON);
+    n->AddNode(CreateNode(SYNTAX_SUBNODE))->AddNode(parse_dottype(p, t));
+  }
+  if(t->token == T_SEMICOLON)
+  {
+    ++t;
+    return n;
+  }
+  ExpectToken(p, t, T_LBRACE);
+  bool ispub = true; // Stuff is public by default
+  while(parse_classdecl(p, t, ispub));
+  ExpectToken(p, t, T_RBRACE);
+  return n;
+}
+
 Node* parse_decl(Program& p, TOKEN*& t, bool* ispub)
 {
   Node* n = CreateNode(NUM_SYNTAX);
@@ -1093,6 +1106,8 @@ Node* parse_decl(Program& p, TOKEN*& t, bool* ispub)
   
   switch(t->token)
   {
+  case T_IMPL:
+    return parse_impl(p, t);
   case T_TRAIT:
   case T_CLASS:
     return parse_class(p, t, n);
@@ -1152,28 +1167,6 @@ Node* parse_import(Program& p, TOKEN*& t)
   return n;
 }
 
-Node* parse_impl(Program& p, TOKEN*& t)
-{
-  CALLFAILURE(T_IMPL);
-  Node* n = CreateNode(SYNTAX_IMPL);
-  n->AddNode(parse_dottype(p, t));
-  if(extract_op(t, T_COLON))
-  {
-    ExpectExtractOp(p, t, T_COLON);
-    n->AddNode(CreateNode(SYNTAX_SUBNODE))->AddNode(parse_dottype(p, t));
-  }
-  if(t->token == T_SEMICOLON)
-  {
-    ++t;
-    return n;
-  }
-  ExpectToken(p, t, T_LBRACE);
-  bool ispub = true; // Stuff is public by default
-  while(parse_classdecl(p, t, ispub));
-  ExpectToken(p, t, T_RBRACE);
-  return n;
-}
-
 Node* parse_chunk(Program& p, TOKEN*& t);
 
 Node* parse_namespace(Program& p, TOKEN*& t)
@@ -1194,15 +1187,8 @@ Node* parse_chunk(Program& p, TOKEN*& t)
   {
   case T_NAMESPACE:
     return parse_namespace(p, t);
-  case T_USING:
-    return parse_using(p, t);
-  case T_ASSUME:
-    return parse_assume(p, t);
-  case T_IMPORT:
-    return parse_import(p, t);
-  case T_IMPL:
-    return parse_impl(p, t);
-  case T_ATTRIBUTE:
+  case T_ASSERT:
+    return parse_assert(p, t);
   case T_MACRO:
     return parse_macro(p, t);
   default: // If it isn't any of those, attempt to parse it as a decl
@@ -1220,10 +1206,21 @@ void BuildAST(Program& p)
   while(cur != end)
   {
     file = CreateNode(SYNTAX_FILE);
+    file->AddNode(CreateNode(SYNTAX_SUBNODE)); // Each file has a subnode section that holds its using statements
     p.root->AddNode(file);
 
     while(cur != end && cur->token != T_EOF)
-      file->AddNode(parse_chunk(p, cur));
+    {
+      switch(cur->token)
+      {
+      case T_USING:
+        file->AddNode(parse_using(p, cur));
+      case T_IMPORT:
+        file->AddNode(parse_import(p, cur));
+      default:
+        file->AddNode(parse_chunk(p, cur));
+      }
+    }
     ++cur; //eat EOF token
   }
 }
@@ -1250,7 +1247,7 @@ void TraverseAST(Program& p, void(*f)(Program&, Node*))
 void DumpASTNode(Program& p, Node* n, std::ostream& out, int level)
 {
   static const char* reverse[] = { "ROOT","FILE","USING","NAMESPACE","ALGEBRIAC","ATTRIBUTE","IMPL","ASSERT","ASSUME",
-    "TRAIT","CLASS","ENUM","FUNCTION","INVOKE","OP","DOTTYPE",  "BASICDECL","VARDECL","BLOCK","FORLOOP","WITH","LOOP",
+    "TRAIT","CLASS","ENUM","FUNCTION","CONSTRUCTOR", "DESTRUCTOR," "INVOKE","OP","DOTTYPE",  "BASICDECL","VARDECL","BLOCK","FORLOOP","WITH","LOOP",
     "SWITCH","IF","RETURN","BREAK","CONTINUE","TRYCATCH","TRYELSE","TRYFINALLY","TEMPLATE","TEMPLATE_PARAM_DEFAULT",
     "TEMPLATE_PARAM_SPEC","TYPE", "TYPE_FN","TYPE_ALGEBRIAC","TYPEID", "TYPEDEF", "VARTYPELAMBDA","LAMBDA","EXPR",
     "TEMPLATEARRAY","SLICE","INITLISTRAW","INITLIST","DOTID", "IMPORT","TOKEN", "VALUE", "VALUE_ID", "VALUE_NUMBER",

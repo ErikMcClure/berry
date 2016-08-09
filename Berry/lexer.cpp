@@ -7,12 +7,11 @@
 
 using namespace bss_util;
 
-// Punctuation characters without escaping:  !"#$%&'()*+,-./:;<=>?@[\]^{|}~
-#define WHITESPACE " \\t\\r\\n\\v\\f"
-#define PUNCTUATION "!\"#$%&'*+\\-./:<=>?@\\\\\\^|~"
-#define RESERVED "`;,()\\[\\]{}"
+#define WHITESPACE " \\t\\r\\n\\v\\f" //  \t\r\n\v\f
+#define PUNCTUATION "!\"#$%&'*+\\-./:<=>?@\\^|\\\\~" // !"#$%&'*+-./:<=>?@^|\~
+#define RESERVED "`;,()\\[\\]{}" // `;,()[]{}
 static const char* trex_err;
-TRex* regex_ID = trex_compile("^[^" PUNCTUATION WHITESPACE RESERVED "]+", &trex_err);
+TRex* regex_ID = trex_compile("^([^" PUNCTUATION WHITESPACE RESERVED "]+|op[^" WHITESPACE RESERVED "]*)", &trex_err);
 //TRex* regex_N = trex_compile("^([0-9]+(\.[0-9]+)?|0x[0-9A-Fa-f]+|0b[01]+|0o[0-7]+)([eE]-?[0-9]+)?[^" PUNCTUATION WHITESPACE RESERVED "]+", &trex_err);
 TRex* regex_N = trex_compile("^[0-9]+(\\.[0-9]+)?([eE]-?[0-9]+)?[^" PUNCTUATION WHITESPACE RESERVED "]*", &trex_err);
 TRex* regex_OP = trex_compile("^[" PUNCTUATION "]+", &trex_err);
@@ -45,10 +44,10 @@ inline unsigned int strinsert(const char* start, const char* end, cDynArray<cStr
 }
 TOKEN parse_inner(const char*& s, cDynArray<cStr, unsigned __int64, CARRAY_SAFE>& strings, cHash<const char*, unsigned int>& hash)
 {
-  static cTrie<TOKENID> t(41, "abstract", "assert", "assume", "attribute", "break", "case", "catch", "class", "const", "continue",
+  static cTrie<TOKENID> t(42, "abstract", "assert", "assume", "attribute", "break", "case", "catch", "class", "const", "continue",
     "else", "enum", "false", "finally", "fn", "for", "if", "impl", "import", "in", "loop", "macro", "namespace",
     "null", "op", "private", "public", "pure", "return", "static", "switch", "template", "trait", "true", "try", "type",
-    "unsafe", "using", "var", "virtual", "while", "with", "_");
+    "unsafe", "using", "var", "virtual", "while", "with", "property", "_");
   const char* begin;
   const char* end;
   TOKENID r;
@@ -173,7 +172,7 @@ const char* ReverseToken(TOKENID token)
     "ID","TYPE", "NUMBER", "OP", "STRING", "CHARACTER", "MACROEXPR", "EMBED", "ABSTRACT","ASSERT","ASSUME","ATTRIBUTE",
     "BREAK","CASE","CATCH","CLASS","CONST","CONTINUE","ELSE","ENUM","FALSE","FINALLY","FN","FOR","IF","IMPL","IMPORT",
     "IN","LOOP","MACRO","NAMESPACE","NULL","OPDEF", "PRIVATE","PUBLIC","PURE","RETURN","STATIC","SWITCH","TEMPLATE",
-    "TRAIT","TRUE","TRY","TYPEDEF", "UNSAFE","USING","VAR","VIRTUAL","WHILE","WITH","UNDERSCORE", "PRIVATEBLOCK",
+    "TRAIT","TRUE","TRY","TYPEDEF", "UNSAFE","USING","VAR","VIRTUAL","WHILE","WITH", "PROPERTY", "UNDERSCORE", "PRIVATEBLOCK",
     "PUBLICBLOCK", "PIN", "DEFREF", "TRAITCOMBINE", "COMMA", "LAMBDAEXPR", "DOT", "ELLIPSES", "COLON", "SEMICOLON",
     "ASSIGN", "TERNERY", "REF", "ALGEBRIAC", "LPAREN", "RPAREN", "LBRACKET", "RBRACKET", "LBRACE", "RBRACE", "EOF"
   };

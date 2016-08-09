@@ -1,102 +1,103 @@
 // Copyright ©2016 Black Sphere Studios
-// For conditions of distribution and use, see copyright notice in LICENSE.txt
+// For conditions of distribution and use, see copyright notice in LICENSE
 
 namespace Berry {
   // Defines the requirements for iterables and iterators
   template[T]
   trait Iterator
   {
-    T@ Next()
+    T@ Next();
   }
   
   template[T]
   trait Iterable
   {
-    Iterator[T] Iter()
-  }
-  
-  /*template[T, I]
-  void foreach[Iterable[I],I](T src, void(I) f)
-  {
-    Iterator[i] iter = src.Iter()
-    I item
-    
-    while((item = iter.Next()) != null)
-      f(item)
-  }
-
-  template[T, I]
-  void foreach[T[:], I](T[:] slice, void(I) f)
-  {
-    for(int i = 0; i < #slice; ++i)
-      f(slice[i])
-  }*/
-  
-  template[A, B]
-  Iterable[B] map(const Iterable[A] s, fn[B](const A) f)
-  {
-    B[#s] b
-    p_uint i = 0;
-    for(A x in s)
-      b[i++] = fn(x)
-    return b
+    Iterator[T] Iter();
   }
   
   template[A, B]
-  Iterable[A] mapmany(const Iterable[A] s, fn[Iterable[B]](const A) f)
+  B[#a] map(const Iterable[A] a, fn[B](const A) f) : b
   {
-    B[] b
-    for(A x in s)
-      b += fn(x)
-    return b
-  })
+    uint i = 0;
+    for(A x in a)
+      b[i++] = fn(x);
+    return b;
+  }
+  
+  template[A, void]
+  Iterable[A]@ map(Iterable[A]@ a, fn[void](A@) f)
+  {
+    for(A@ x in a)
+      fn(x);
+    return a;
+  }
+  
+  template[A, B]
+  B[] map(const Iterable[A] a, fn[Iterable[B]](const A) f) : b
+  {
+    for(A x in a)
+      b += fn(x);
+  }
   
   template[A]
-  Iterable[A] filter(const Iterable[A] s, fn[bool](const A) f)
+  A@[] filter(const Iterable[A] a, fn[bool](const A) f) : v
   {
-    A[] l
     for(A item in s) 
       if(f(item))
-        l += s
-    return l
+        v += @s;
+    return l;
+  }
+  
+  template[A!]
+  A[] filter(const Iterable[A] a, fn[bool](const A) f) : v
+  {
+    for(A item in s) 
+      if(f(item))
+        v += s;
+    return l;
+  }
+  
+  //template[A] // This uses inferred template arguments
+  //A[fold(a, 0, fn(n,x) -> n + #x)] reduce(const I a) : b
+  template[A, I:Iterable[V], V:Iterable[A]] // This is with explicit template arguments
+  A[fold[I, uint](a, 0, fn[uint](uint n, const V x) { return n + #x; })] reduce(const I a) : b
+  {
+    uint i = 0;
+    for(var item in a)
+      for(var subitem in item)
+        b[i++] = subitem;
   }
   
   template[A]
-  Iterable[A] concat(const Iterable[Iterable[A]] s)
+  bool any(const Iterable[A] a, fn[bool](const A) f)
   {
-    var l = foldl(s, 0, fn[var](var x) { return #x })
-    A[l] list;
-    p_uint i = 0;
-    for(var item in s)
-      for(var subitem in s)
-        list[i++] = subitem;
-    return list;
-  }
-  
-  template[A, T:Iterable[A]]
-  bool any(const Iterable[A] s, fn[bool](const A)@ f = null)
-  {
-    if(f == null)
-      return #s > 0
-    for(A x in s)
+    for(A x in a)
       if(f(x))
-        return true
-    return false
+        return true;
+    return false;
   }
   
   template[A]
-  bool all(const Iterable[A] s, fn[bool](const A) f)
+  bool all(const Iterable[A] a, fn[bool](const A) f)
   {
-    for(A x in s)
+    for(A x in a)
       if(!f(x))
-        return false
-    return true
+        return false;
+    return true;
   }
   
-  template[A]
-  A fold(const Iterable[A] s, A init, fn[A](const A, const A)@ f)
+  template[A, B]
+  B fold(const Iterable[A] a, B init, fn[B](const B, const A) f)
   {
-    for(A x in s)
+    for(A x in a)
+      init = f(init, x);
+    return init;
+  }
+  
+  template[A, B]
+  B aggregate(B init, fn[B](const B, const A) f, A... args)
+  {
+    for(A x in args)
       init = f(init, x);
     return init;
   }

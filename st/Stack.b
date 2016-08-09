@@ -4,27 +4,31 @@
 namespace Berry {
   // Implements an array-based Stack
   template[T]
-  class Stack {
-    Stack(const Stack r) : _a(r._a), _len(r._len) {}
-    Stack(p_uint n=0) : _a(n), _len(0) {}
-    void Push(const T v) { if(++_len>#_a) _a.Resize(FBNext(#_a)); assert(_len-1<#_a); _a[_len-1]=v; }
-    T Peek() const { return _a[_len-1]; }
-    T@ Peek() { return _a[_len-1]; }
-    T Pop() { return _a[--_len]; }
-    void Discard() { --_len; }
-    p_uint Length() const { return _len; }
-    p_uint Capacity() const { return #_a; }
+  class Stack
+  {
+    Stack(uint n=0) : _a(n) {}
+    void Push(const T v) { _a.Add(v); }
+    T Peek() const { return _a[-1]; }
+    T@ Peek() { return _a[-1]; }
+    T Pop() { T r = _a[-1]; _a.RemoveLast(); return r; }
+    void Discard() { _a.RemoveLast(); }
+    void Clear() { _a.Clear(); }
+    property uint Length(uint length) { return _a.Length = length; }
+    property uint Length() const { return _a.Length; }
+    property uint Capacity(uint capacity) { return _a.Capacity = capacity; }
+    property uint Capacity() const { return _a.Capacity; }
     
-    T[:] op() { return _a }
-    const T[:] op() const { return _a }
-    Stack@ op<<(const T v) { Push(v); return this; }
-    Stack@ op>>(T@ v) { v=Pop(); return this; }
-    T op$() const { return Peek(); }
-    Stack@ op=(const Stack r) { Array.op=(r); _len=r._len; return this; }
-    p_uint op#() const { return _len; }
+    uint op#() const { return #a; }
+    T@ op[](uint i) { return a[i]; }
+    const T op[](uint i) const { return _a[i] }
+    Slice[T] op[:](uint i,uint n) const { return _a[i:n]; }
+    T[:] op() { return (T[:])_a; }
+    const T[:] op() const { return (const T[:])_a; }
+    Stack$ op<:(const T v) { Push(v); return this; }
+    Stack$ op:>(T@ v) { v = _a[-1]; _a.RemoveLast(); return this; }
+    T op~() const { return Peek(); }
     
-  protected:
-    p_uint _len;
-    T[] _a; // gets turned into a resizable array.
+  private:
+    T[] _a;
   }
 }  
