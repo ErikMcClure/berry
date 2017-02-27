@@ -1,4 +1,4 @@
-// Copyright ©2016 Black Sphere Studios
+// Copyright ©2017 Black Sphere Studios
 // For conditions of distribution and use, see copyright notice in "bss_util.h"
 
 #ifndef __BSS_ALLOC_RING_H__
@@ -6,6 +6,7 @@
 
 #include "lockless.h"
 #include "LLBase.h"
+#include "rwlock.h"
 
 namespace bss_util {
   // Primary implementation of a multi-consumer multi-producer lockless ring allocator
@@ -13,104 +14,90 @@ namespace bss_util {
   {
     struct Bucket
     {
-      Bucket* next;
+      Bucket* next; // next free bucket
       size_t sz;
-      std::atomic<size_t> used; // How much is actually used (allocations that went through)
-      std::atomic<size_t> free; // How much is currently freed
       std::atomic<size_t> reserved; // How much was attempted to be used (includes allocations over the limit)
       LLBase<Bucket> list; // position on permanent doubly linked list
-      std::atomic_flag recycling; // flag used to ensure only one thread attempts to recycle at a time.
+      RWLock lock;
     };
 
     struct Node
     {
       size_t sz;
-      Bucket* root;
+      Bucket* p;
     };
 
   public:
     cRingAllocVoid(cRingAllocVoid&& mov) : _gc(mov._gc), _lastsize(mov._lastsize), _list(mov._list)
     {
-      _root.store(mov._root.load(std::memory_order_relaxed), std::memory_order_relaxed);
-      _readers.store(mov._readers.load(std::memory_order_relaxed), std::memory_order_relaxed);
-      _flag.store(mov._flag.load(std::memory_order_relaxed), std::memory_order_relaxed);
-      mov._root = 0;
+      _lock.clear(std::memory_order_release);
+      _cur.store(mov._cur.load(std::memory_order_acquire), std::memory_order_release);
+      mov._cur.store(0, std::memory_order_release);
       mov._list = 0;
     }
     explicit cRingAllocVoid(size_t sz) : _lastsize(sz), _list(0)
     {
+      _lock.clear(std::memory_order_release);
       _gc.p = 0;
       _gc.tag = 0;
-      _root.store(_genbucket(sz, 0), std::memory_order_relaxed);
-      _readers.store(0, std::memory_order_relaxed);
-      _flag.store(false, std::memory_order_relaxed);
+      _cur.store(_genbucket(sz), std::memory_order_release);
     }
     ~cRingAllocVoid() { _clear(); }
 
-    inline void* BSS_FASTCALL alloc(size_t num) noexcept
+    inline void* alloc(size_t num) noexcept
     {
-ALLOC_BEGIN:
+      size_t n = num + sizeof(Node);
+      Bucket* cur;
+      size_t r, rend;
       for(;;)
       {
-        while(_flag.load(std::memory_order_acquire));
-        _readers.fetch_add(1, std::memory_order_release);
-        if(!_flag.load(std::memory_order_acquire))
-          break;
-        _readers.fetch_sub(1, std::memory_order_release);
-        continue;
-      }
-
-      size_t n = num + sizeof(Node);
-      Bucket* root = _root.load(std::memory_order_acquire);
-      size_t r = root->reserved.fetch_add(n, std::memory_order_acquire) + n; // Add num here because fetch_add returns the PREVIOUS value
-      if(r > root->sz) // If we went over the limit, we'll have to grab another bucket
-      {
-        _readers.fetch_sub(1, std::memory_order_release);
-        if(!_flag.exchange(true, std::memory_order_acq_rel))
+        cur = _cur.load(std::memory_order_acquire);
+        if(!cur->lock.AttemptRLock()) // If this fails we probably got a bucket that was in the middle of being recycled
+          continue;
+        r = cur->reserved.fetch_add(n, std::memory_order_acq_rel);
+        rend = r + n;
+        if(rend > cur->sz) // If we went over the limit, we'll have to grab another bucket
         {
-          while(_readers.load(std::memory_order_acquire)>0);
-          root = _root.load(std::memory_order_acquire);
-          if(root->reserved.load(std::memory_order_relaxed) > root->sz) // Ensure the root actually still needs to be swapped out to avoid race conditions.
-          { 
-            Bucket* oldroot = root;
-            // If the next bucket doesn't exist or isn't big enough, allocate a new one.
-            if(root->next != 0 && root->next->sz >= n)
-              root = root->next;
-            else
-              root = _genbucket(n, root->next);
-            _root.store(root, std::memory_order_release);
-            _checkrecycle(oldroot);
+          cur->reserved.fetch_sub(n, std::memory_order_release);
+          cur->lock.RUnlock();
+          if(!r) // If r was zero, it's theoretically possible for this bucket to get orphaned, so we send it into the _checkrecycle function
+            _checkrecycle(cur); // Even if someone else acquires the lock before this runs, either the allocation will succeed or this check will
+          if(!_lock.test_and_set(std::memory_order_acq_rel))
+          {
+            _cur.store(_genbucket(n), std::memory_order_release);
+            _lock.clear(std::memory_order_release);
           }
-          _flag.store(false, std::memory_order_release);
         }
-        goto ALLOC_BEGIN; // Restart the entire function (a goto is used here instead of a break out of an infinite for loop because that's arguably even harder to understand)
+        else
+          break;
       }
 
-      // If we get here, we know our last addition didn't go over the limit, so we can add our amount to used.
-      size_t pos = root->used.fetch_add(n, std::memory_order_acq_rel); // The position returned here is our unique allocation.
-      Node* ret = (Node*)(((char*)(root + 1)) + pos);
+      Node* ret = (Node*)(((char*)(cur + 1)) + r);
 #ifdef BSS_DEBUG
       uint8_t* check = (uint8_t*)ret;
       for(uint32_t i = 0; i < n; ++i) assert(check[i] == 0xfc);
 #endif
       ret->sz = n;
-      ret->root = root;
-      _readers.fetch_sub(1, std::memory_order_release);
-      return ret+1;
+      ret->p = cur;
+      return ret + 1;
     }
-    inline void BSS_FASTCALL dealloc(void* p) noexcept
+    template<class T>
+    inline T* allocT(size_t count = 1) noexcept { return (T*)alloc(sizeof(T)*count); }
+
+    inline void dealloc(void* p) noexcept
     {
       Node* n = ((Node*)p)-1;
-      n->root->free.fetch_add(n->sz, std::memory_order_release);
-      _checkrecycle(n->root);
+      Bucket* b = n->p; // grab bucket pointer before we annihilate the node
 #ifdef BSS_DEBUG
       memset(n, 0xfc, n->sz); // n->sz is the entire size of the node, including the node itself.
 #endif
+      b->lock.RUnlock();
+      _checkrecycle(b);
     }
     inline void Clear()
     {
       _clear();
-      _root.store(_genbucket(_lastsize, 0), std::memory_order_relaxed);
+      _cur.store(_genbucket(_lastsize), std::memory_order_release);
     }
 
     cRingAllocVoid& operator=(cRingAllocVoid&& mov) noexcept
@@ -119,10 +106,8 @@ ALLOC_BEGIN:
       _gc = mov._gc;
       _lastsize = mov._lastsize;
       _list = mov._list;
-      _root.store(mov._root.load(std::memory_order_relaxed), std::memory_order_relaxed);
-      _readers.store(mov._readers.load(std::memory_order_relaxed), std::memory_order_relaxed);
-      _flag.store(mov._flag.load(std::memory_order_relaxed), std::memory_order_relaxed);
-      mov._root = 0;
+      _cur.store(mov._cur.load(std::memory_order_acquire), std::memory_order_release);
+      mov._cur.store(0, std::memory_order_release);
       mov._list = 0;
       return *this;
     }
@@ -137,65 +122,81 @@ ALLOC_BEGIN:
       {
         hold = _list;
         _list = _list->list.next;
+        assert(!hold->lock.ReaderCount()); // verify no memory is being held
         free(hold);
       }
       _gc.p = 0;
       _gc.tag = 0;
-      _root.store(0, std::memory_order_relaxed);
+      _cur.store(0, std::memory_order_release);
     }
-    Bucket* _genbucket(size_t num, Bucket* next) noexcept
+    // It is crucial that only allocation sizes are passed into this, or the ring allocator will simply keep allocating larger and larger buckets forever
+    Bucket* _genbucket(size_t num) noexcept
     {
       if(_lastsize < num) _lastsize = num;
 
       // If there are buckets in _gc, see if they are big enough. If they aren't, throw them out
       bss_PTag<Bucket> prev ={ 0, 0 };
       bss_PTag<Bucket> nval ={ 0, 0 };
-      while(!asmcasr<bss_PTag<Bucket>>(&_gc, nval, prev, prev)); // set _gc to null
-
-      Bucket* hold = prev.p;
-      while(hold != 0 && hold->sz < num) // throw any buckets that are too small back into _gc
+      asmcasr<bss_PTag<Bucket>>(&_gc, prev, prev, prev);
+      Bucket* hold;
+      while((hold = prev.p) != 0)
       {
-        prev.p = hold;
-        hold = hold->next;
-        _recycle(prev.p);
+        nval.p = prev.p->next;
+        nval.tag = prev.tag + 1;
+        if(!asmcasr<bss_PTag<Bucket>>(&_gc, nval, prev, prev)) // Loop until we atomically extract the first bucket from GC
+          continue;
+        if(hold->sz < num) // If a bucket is too small for this allocation, destroy it
+        {
+          AltLLRemove<Bucket, &_getbucket>(hold, _list);
+          assert(!hold->lock.ReaderCount()); // verify no memory is being held
+          free(hold);
+        }
+        else // Otherwise, break out of the loop using this bucket
+          break;
       }
 
       if(!hold) // If hold is nullptr we need a new bucket
       {
         _lastsize = T_FBNEXT(_lastsize);
-        hold = (Bucket*)malloc(sizeof(Bucket)+_lastsize);
+        hold = (Bucket*)calloc(1, sizeof(Bucket)+_lastsize);
+        new (&hold->lock) RWLock();
         hold->sz = _lastsize;
-        hold->next = 0;
-        hold->list.next = hold->list.prev = 0;
-        hold->recycling.clear();
         AltLLAdd<Bucket, &_getbucket>(hold, _list);
-      }
-
-      if(hold->next) // If there are trailing buckets we need to put them back in the GC
-        _recycle(hold->next);
-      hold->next = next;
-      hold->used.store(0, std::memory_order_relaxed);
-      hold->reserved.store(0, std::memory_order_relaxed);
-      hold->free.store(0, std::memory_order_relaxed);
-
 #ifdef BSS_DEBUG
-      memset(hold+1, 0xfc, hold->sz);
+        memset(hold + 1, 0xfc, hold->sz);
 #endif
+      }
+      else
+      {
+#ifdef BSS_DEBUG
+        memset(hold + 1, 0xfc, hold->sz);
+#endif
+        hold->reserved.store(0, std::memory_order_relaxed);
+        hold->lock.Unlock();
+      }
 
       return hold;
     }
 
     void _checkrecycle(Bucket* b) noexcept
     {
-      if(b->used.load(std::memory_order_acquire) == b->free.load(std::memory_order_acquire)
-        && b->reserved.load(std::memory_order_acquire) > b->sz
-        && b != _root.load(std::memory_order_acquire))
+      if(b->lock.AttemptStrictLock())
       {
-        if(!b->recycling.test_and_set(std::memory_order_acq_rel))
+        if(b == _cur.load(std::memory_order_acquire)) // If this appears to be the current bucket, we can't recycle it
         {
-          _recycle(b);
-          b->recycling.clear();
+          if(!_lock.test_and_set(std::memory_order_acq_rel)) // So we attempt to acquire the lock for the _cur object
+          {
+            if(b == _cur.load(std::memory_order_acquire)) // If we get the lock, verify we are still the current bucket
+            {
+              b->reserved.store(0, std::memory_order_release); // If we are, we can "recycle" this bucket by just resetting the reserved to 0.
+              b->lock.Unlock(); // Now we can unlock because we have been "recycled" into the current bucket.
+              _lock.clear(std::memory_order_release);
+              return;
+            }
+            _lock.clear(std::memory_order_release); // Otherwise, drop the lock and recycle as normal
+          }
         }
+        _recycle(b);
       }
     }
 
@@ -211,15 +212,14 @@ ALLOC_BEGIN:
       } while(!asmcasr<bss_PTag<Bucket>>(&_gc, nval, prev, prev));
     }
 
-    BSS_ALIGN(16) bss_PTag<Bucket> _gc; // Contains a list of discarded buckets
+    BSS_ALIGN(16) bss_PTag<Bucket> _gc; // Contains a list of empty buckets that can be used to replace _root
 #pragma warning(push)
 #pragma warning(disable:4251)
-    BSS_ALIGN(16) std::atomic<Bucket*> _root;
-    BSS_ALIGN(64) std::atomic<size_t> _readers; // How many threads are currently depending on _root to not change
-    BSS_ALIGN(64) std::atomic_bool _flag; // Blocking flag for when _root needs to change
+    BSS_ALIGN(16) std::atomic<Bucket*> _cur; // Current bucket
+    BSS_ALIGN(64) std::atomic_flag _lock; // GC lock
 #pragma warning(pop)
     size_t _lastsize; // Last size used for a bucket.
-    Bucket* _list; // root of permanent list of all active allocated buckets.
+    Bucket* _list; // root of permanent list of all buckets.
   };
 
   template<class T>
@@ -231,7 +231,7 @@ ALLOC_BEGIN:
   public:
     inline cRingAlloc(cRingAlloc&& mov) : cRingAllocVoid(std::move(mov)) {}
     inline explicit cRingAlloc(size_t init=8) : cRingAllocVoid(init) { }
-    inline T* BSS_FASTCALL alloc(size_t num) noexcept { return (T*)cRingAllocVoid::alloc(num*sizeof(T)); }
+    inline T* alloc(size_t num) noexcept { return (T*)cRingAllocVoid::alloc(num*sizeof(T)); }
     inline cRingAlloc& operator=(cRingAlloc&& mov) noexcept { cRingAllocVoid::operator=(std::move(mov)); return *this; }
   };
 

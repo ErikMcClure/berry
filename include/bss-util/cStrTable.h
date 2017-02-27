@@ -1,4 +1,4 @@
-// Copyright ©2016 Black Sphere Studios
+// Copyright ©2017 Black Sphere Studios
 // For conditions of distribution and use, see copyright notice in "bss_util.h"
 
 #ifndef __C_STR_TABLE_H__BSS__
@@ -99,7 +99,7 @@ namespace bss_util {
     inline cStrTable& operator+=(const char* right) { AppendString(right); return *this; }
 
   protected:
-    void BSS_FASTCALL _construct(const T* const* strings, CT_ size)
+    void _construct(const T* const* strings, CT_ size)
     {
       if(!strings || !size) //special handling for empty case
         return;
